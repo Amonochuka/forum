@@ -166,3 +166,54 @@ func (r *ReactionRepository) GetCommentReactions(commentID int) ([]*Reaction, er
 	}
 	return reactions, nil
 }
+
+func (r *ReactionRepository) GetUserReaction(userID int, postID *int, commentID *int) (*Reaction, error) {
+	if postID != nil {
+		row := r.DB.QueryRow(`
+		SELECT id, user_id, post_id, comment_id, reaction_type, created_at
+		FROM reactions
+		WHERE user_id = ? AND post_id = ?`, userID, *postID)
+		reaction := &Reaction{}
+		err := row.Scan(
+			&reaction.ID,
+			&reaction.UserID,
+			&reaction.PostID,
+			&reaction.CommentID,
+			&reaction.Type,
+			&reaction.CreatedAt,
+		)
+
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		if err != nil {
+			return nil, fmt.Errorf("get user reaction (post): %w", err)
+		}
+
+		return reaction, nil
+	}
+
+	row := r.DB.QueryRow(`
+	SELECT id, user_id, post_id, comment_id, reaction_type, created_at
+	FROM reactions
+	WHERE user_id = ? AND comment_id = ?`, userID, *commentID)
+
+	reaction := &Reaction{}
+	err := row.Scan(
+		&reaction.ID,
+		&reaction.UserID,
+		&reaction.PostID,
+		&reaction.CommentID,
+		&reaction.Type,
+		&reaction.CreatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("get user reaction (comment): %w", err)
+	}
+	return reaction, nil
+}
