@@ -1,6 +1,6 @@
 PRAGMA foreign_keys = ON;
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
     username TEXT UNIQUE NOT NULL,
@@ -8,13 +8,13 @@ CREATE TABLE users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS  categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT UNIQUE NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS  posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     title TEXT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE posts (
 );
 
 -- Bridge table for many-to-many
-CREATE TABLE post_categories (
+CREATE TABLE IF NOT EXISTS  post_categories (
     post_id INTEGER NOT NULL,
     category_id INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -33,7 +33,7 @@ CREATE TABLE post_categories (
     FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
-CREATE TABLE comments (
+CREATE TABLE  IF NOT EXISTS comments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     post_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE comments (
     FOREIGN KEY(parent_id) REFERENCES comments(id) ON DELETE CASCADE
 );
 
-CREATE TABLE reactions (
+CREATE TABLE IF NOT EXISTS reactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     post_id INTEGER,
@@ -57,7 +57,7 @@ CREATE TABLE reactions (
     FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE
 );
 
-CREATE TABLE sessions (
+CREATE TABLE IF NOT EXISTS sessions (
     id TEXT PRIMARY KEY, -- UUID
     user_id INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
