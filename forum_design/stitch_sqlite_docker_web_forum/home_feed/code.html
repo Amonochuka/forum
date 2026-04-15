@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Home Feed | The Scholarly Forum</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#1b1b21",
+                      "surface-container-high": "#eae7ef",
+                      "outline": "#767683",
+                      "on-surface-variant": "#454652",
+                      "tertiary-container": "#4f2400",
+                      "surface-container-highest": "#e4e1ea",
+                      "inverse-primary": "#bdc2ff",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed": "#311300",
+                      "tertiary-fixed": "#ffdcc6",
+                      "on-secondary-fixed-variant": "#354a53",
+                      "surface-container": "#efecf5",
+                      "on-primary-fixed": "#000767",
+                      "tertiary": "#301300",
+                      "on-primary-fixed-variant": "#343d96",
+                      "on-error-container": "#93000a",
+                      "inverse-surface": "#303036",
+                      "inverse-on-surface": "#f2eff8",
+                      "surface-bright": "#fbf8ff",
+                      "surface-container-lowest": "#ffffff",
+                      "background": "#fbf8ff",
+                      "tertiary-fixed-dim": "#ffb786",
+                      "outline-variant": "#c6c5d4",
+                      "on-secondary-fixed": "#071e27",
+                      "surface": "#fbf8ff",
+                      "primary": "#000666",
+                      "on-tertiary-container": "#ec7700",
+                      "on-primary": "#ffffff",
+                      "surface-variant": "#e4e1ea",
+                      "error": "#ba1a1a",
+                      "on-secondary": "#ffffff",
+                      "on-background": "#1b1b21",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#e0e0ff",
+                      "secondary": "#4c616c",
+                      "primary-fixed-dim": "#bdc2ff",
+                      "surface-container-low": "#f5f2fb",
+                      "primary-container": "#1a237e",
+                      "secondary-fixed": "#cfe6f2",
+                      "on-tertiary-fixed-variant": "#723600",
+                      "on-primary-container": "#8690ee",
+                      "surface-dim": "#dbd9e1",
+                      "on-error": "#ffffff",
+                      "surface-tint": "#4c56af",
+                      "secondary-container": "#cfe6f2",
+                      "on-secondary-container": "#526772",
+                      "secondary-fixed-dim": "#b4cad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-50/80 backdrop-blur-xl flex justify-between items-center px-8 h-16 max-w-full mx-auto shadow-[0_12px_40px_rgba(27,27,33,0.06)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold font-['Manrope'] text-[#1A237E]">The Scholarly Forum</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="font-['Manrope'] font-semibold tracking-tight text-sm text-[#1A237E] border-b-2 border-[#1A237E] pb-1" href="#">Discussions</a>
+<a class="font-['Manrope'] font-semibold tracking-tight text-sm text-slate-500 hover:text-[#1A237E] transition-colors" href="#">Categories</a>
+<a class="font-['Manrope'] font-semibold tracking-tight text-sm text-slate-500 hover:text-[#1A237E] transition-colors" href="#">Curators</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-surface-container-low rounded-full px-4 py-2 border-none">
+<span class="material-symbols-outlined text-outline mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48" placeholder="Search threads..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-slate-100 rounded-full transition-all">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-slate-100 rounded-full transition-all">settings</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-6 py-2 rounded-full font-semibold text-sm transition-transform active:scale-95">New Post</button>
+<div class="h-10 w-10 rounded-full bg-surface-container-high border border-outline-variant/20 overflow-hidden">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="close-up portrait of a professional scholar with warm lighting and a neutral grey background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbrTbsLD1ybUNBITVYtcSDUDy3UrKls-AG8R2iGbn0idn3Juk-4DtpcH90W-fvxMz2Q-jqret4-jQfDbcVeGJ2R2Zw3Z1WpUmt_GBDMIZ9JGR3ym3QIZyqQNiKaMMGcYstcBuYNZqPQ5aztw_MTZ7NVkgJq6E7N_j29imULJIu0RW0paPrgKCCrRkpP4oCy8yyKY4nSe9fCl7EHBj6nYa78E7qh9noLkomc2ViNvGmuVdY3ujsThhgE62Z40EzZQUVbteZxGclCpBB"/>
+</div>
+</div>
+</div>
+</nav>
+<div class="flex min-h-screen pt-16">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 bg-[#f5f2fb] flex flex-col gap-2 p-6 pt-12 hidden md:flex">
+<div class="flex items-center gap-4 mb-8">
+<div class="w-12 h-12 rounded-xl bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined">auto_stories</span>
+</div>
+<div>
+<h3 class="font-['Manrope'] font-black text-lg text-[#1A237E] leading-tight">The Curator</h3>
+<p class="text-xs font-medium text-on-surface-variant/70 uppercase tracking-widest">Civil Discourse</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 bg-white text-[#1A237E] font-bold rounded-lg px-4 py-3 shadow-sm transition-all" href="#">
+<span class="material-symbols-outlined">home_max</span>
+<span class="font-['Inter'] font-medium text-sm">Home Feed</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:translate-x-1 hover:bg-white/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-['Inter'] font-medium text-sm">My Threads</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:translate-x-1 hover:bg-white/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-['Inter'] font-medium text-sm">Liked Posts</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:translate-x-1 hover:bg-white/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">auto_awesome_motion</span>
+<span class="font-['Inter'] font-medium text-sm">Collections</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 px-4 py-3 hover:translate-x-1 hover:bg-white/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-['Inter'] font-medium text-sm">Archives</span>
+</a>
+</nav>
+<div class="mt-auto space-y-6">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-white py-3 rounded-full font-bold text-sm shadow-lg shadow-primary/20">Join Community</button>
+<div class="space-y-1 pt-4 border-t border-outline-variant/20">
+<a class="flex items-center gap-3 text-slate-500 px-4 py-2 hover:text-[#1A237E] transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">help</span>
+<span class="font-['Inter'] text-xs uppercase tracking-wide">Help Center</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 px-4 py-2 hover:text-[#1A237E] transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">policy</span>
+<span class="font-['Inter'] text-xs uppercase tracking-wide">Privacy</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-0 md:ml-64 bg-surface-container-low min-h-screen px-4 md:px-12 py-10">
+<div class="max-w-5xl mx-auto">
+<!-- Hero/Header Section -->
+<header class="mb-12">
+<h1 class="text-4xl md:text-5xl font-extrabold text-primary tracking-tight mb-4">Curated Intellect</h1>
+<p class="text-on-surface-variant max-w-2xl text-lg leading-relaxed">
+                        Welcome to the archive of high-fidelity discourse. Engage with topics curated for depth and architectural clarity.
+                    </p>
+</header>
+<!-- Category Filters Bar -->
+<div class="flex items-center gap-4 mb-10 overflow-x-auto pb-4 scrollbar-hide">
+<button class="bg-primary text-white px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">All Topics</button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-secondary-fixed transition-colors">Philosophy</button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-secondary-fixed transition-colors">Science</button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-secondary-fixed transition-colors">Art &amp; Design</button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-secondary-fixed transition-colors">History</button>
+<button class="bg-secondary-container text-on-secondary-container px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-secondary-fixed transition-colors">Economics</button>
+<div class="ml-auto flex items-center gap-2">
+<span class="text-xs font-bold text-on-surface-variant/60 uppercase tracking-tighter">Sort by:</span>
+<select class="bg-transparent border-none text-sm font-bold text-primary focus:ring-0 cursor-pointer">
+<option>Latest</option>
+<option>Trending</option>
+<option>Most Liked</option>
+</select>
+</div>
+</div>
+<!-- Feed Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Main Feed -->
+<div class="lg:col-span-8 space-y-6">
+<!-- Post Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl p-8 transition-all hover:translate-y-[-4px] group">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-8 h-8 rounded-full bg-tertiary-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary text-sm" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<span class="text-xs font-bold text-tertiary uppercase tracking-widest">Trending Discussion</span>
+<span class="text-outline-variant">•</span>
+<span class="text-xs font-medium text-on-surface-variant">14 mins ago</span>
+</div>
+<h2 class="text-2xl font-bold text-primary leading-tight mb-4 group-hover:text-primary-container transition-colors">The Architectural Impact of Modernist Minimalism on Digital Interface Logic</h2>
+<p class="text-on-surface-variant leading-relaxed text-lg mb-8 line-clamp-3">
+                                Exploring how the principles of Bauhaus and Swiss Design are re-emerging in the "No-Line" UI era. We examine the shift from skeuomorphic clutter to tonal layering and spatial hierarchy in contemporary software...
+                            </p>
+<div class="flex items-center justify-between pt-6 border-t border-slate-50">
+<div class="flex items-center gap-4">
+<img alt="Author" class="w-10 h-10 rounded-full" data-alt="professional portrait of a man in his 30s with a clean background and soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP29u--optXFMZpqtn-Jfp1dpprEfEoAlLWLPwdoNyHwrm0CsZUuCNsYY8nMrgvlKrsuOks-Wthuagao-ydVo5R9ROQGvRZKn5_MGNXFAUFW16mhqCrgJUipKQmpqZEjwbgHBdQeRyysuplduVZ6zhtLoml80kyiuNmWuE0bzQnIMIa0f2RyR7KM7bIk532qJoHDVOhHHYe7KJoHg44gv5F5e7VY66o1ltzE3cIHPE9w76mCw_OtWSMHW9oGkTQh3WDRjKJ8qe23vH"/>
+<div>
+<p class="text-sm font-bold text-primary">Dr. Julian Vance</p>
+<p class="text-xs text-on-surface-variant">Design Historian</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group/btn">
+<span class="material-symbols-outlined group-hover/btn:fill-1">thumb_up</span>
+<span class="font-headline text-sm font-bold">1.2k</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">thumb_down</span>
+<span class="font-headline text-sm font-bold">42</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-headline text-sm font-bold">188</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Post Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl p-8 transition-all hover:translate-y-[-4px] group">
+<div class="flex items-center gap-3 mb-6">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider">Philosophy</span>
+<span class="text-outline-variant">•</span>
+<span class="text-xs font-medium text-on-surface-variant">2 hours ago</span>
+</div>
+<h2 class="text-2xl font-bold text-primary leading-tight mb-4 group-hover:text-primary-container transition-colors">Existentialism in the Age of Algorithmic Determinism</h2>
+<p class="text-on-surface-variant leading-relaxed text-lg mb-8 line-clamp-3">
+                                Is individual agency still a viable philosophical concept when our choices are curated by predictive models? A deep dive into Sartre's "Bad Faith" through the lens of modern social media loops.
+                            </p>
+<div class="flex items-center justify-between pt-6 border-t border-slate-50">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">EM</div>
+<div>
+<p class="text-sm font-bold text-primary">Elena Moretti</p>
+<p class="text-xs text-on-surface-variant">Scholarly Curator</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group/btn">
+<span class="material-symbols-outlined">thumb_up</span>
+<span class="font-headline text-sm font-bold">856</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">thumb_down</span>
+<span class="font-headline text-sm font-bold">12</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-headline text-sm font-bold">45</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Post Card 3 (Image Focused) -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden transition-all hover:translate-y-[-4px] group">
+<div class="h-48 w-full bg-slate-200">
+<img alt="History Discussion Banner" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="dramatic lighting on marble statues in a classic museum gallery with high ceilings and soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuwYtWH3uaqw6XgDoxQWUs139Icsu3FCoWEzGIWTvetQ7NNrXZlefGjQkbNqjWjG7CN7iU_zTBYMhtOEh_byxGbBPLIdd3mH7hKaveFIKsV5Gadpxiai5u8vn5HEH2FA8DhXTjlHOlzUxb7a7BmmjpzsS0DOvntz_SiJGJV6lOUJSt_-oiPqLy07kvj6o_TAhfmyt3yR9jJirAAOeEceOnfqYUMtRwkkz1c2fNoLhrTuU1RxkZqz7Eul7_AnmcpvMPGDe7VrpYB-uv"/>
+</div>
+<div class="p-8">
+<div class="flex items-center gap-3 mb-6">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider">Art History</span>
+<span class="text-outline-variant">•</span>
+<span class="text-xs font-medium text-on-surface-variant">5 hours ago</span>
+</div>
+<h2 class="text-2xl font-bold text-primary leading-tight mb-4 group-hover:text-primary-container transition-colors">Re-evaluating Neoclassicism in the Post-Digital Landscape</h2>
+<p class="text-on-surface-variant leading-relaxed text-lg mb-8 line-clamp-2">
+                                    How the digital obsession with perfection is bringing back a new form of neoclassical aesthetics in virtual spaces.
+                                </p>
+<div class="flex items-center justify-between pt-6 border-t border-slate-50">
+<div class="flex items-center gap-4">
+<img alt="Author" class="w-10 h-10 rounded-full" data-alt="close-up of a thoughtful woman in a professional setting with soft daylight and blurry books in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUeWMTgsZ47mVx88ypYe8MVQOqeRffPUCRGDiC7JWudb6MlpQbMVhajBllhoZ_Q7WmsE4sNVxIT2wKZbN7HcYdAKFUZT_752cRoUkrOaPRTAJVweERXNSMNSoYpXm-Lf94f2b0ng0FO4C8Mzgxh52TZv3l39AiAEp6CmnLM4wPdaGRTKdBoGe8tIB9E-QbQzCfkVDN1pV38NIUIWSygPmW4kZWoO9IUnHkYCjGYDMcEtRDO8rAUmNpsuYREQUSnHUHhSWJBsGvH2xr"/>
+<div>
+<p class="text-sm font-bold text-primary">Sarah Chen</p>
+<p class="text-xs text-on-surface-variant">Art Critic</p>
+</div>
+</div>
+<div class="flex items-center gap-6 text-on-surface-variant">
+<span class="material-symbols-outlined text-xl">favorite</span>
+<span class="font-headline text-sm font-bold">2.4k</span>
+</div>
+</div>
+</div>
+</article>
+</div>
+<!-- Right Sidebar / Secondary Info -->
+<div class="lg:col-span-4 space-y-8">
+<!-- Community Stats Card -->
+<div class="bg-white rounded-xl p-8 border border-outline-variant/10">
+<h3 class="text-lg font-bold text-primary mb-6">Forum Intel</h3>
+<div class="space-y-6">
+<div class="flex justify-between items-end">
+<span class="text-sm font-medium text-on-surface-variant">Active Scholars</span>
+<span class="text-2xl font-bold font-headline text-primary">12.4k</span>
+</div>
+<div class="h-2 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-end">
+<span class="text-sm font-medium text-on-surface-variant">Peer Reviewed</span>
+<span class="text-2xl font-bold font-headline text-primary">84%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[84%] rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Top Curators Card -->
+<div class="bg-white rounded-xl p-8 border border-outline-variant/10">
+<h3 class="text-lg font-bold text-primary mb-6">Top Curators</h3>
+<div class="space-y-6">
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-slate-200">
+<img alt="Curator" class="w-full h-full object-cover" data-alt="professional male portrait with a clean blue background and soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNJOpqIyQOky7A_wYvUzkqsXAGmh5nSOcmhfR8jwe50vs5W56LX01uH_PjMY2K0UNZ74c_QSLiqKADzvN6hDK7c9fuhIFW21Bk__BbG7Be0HtlW-JeQ_ncMmPwfVXN9BHwdO80MkrGjvF4VYE0Z8FEKxodUVm9wc_LmWbCF9D4IblpTpWfr2LpBNwDjEA-0JIvV6C08Ck-mLCldkH10HLONhRXGwXq5HkkwHR5w_-C44jwnnvnE5AHfx-UMGkWEMnjMOr16OvtKmM8"/>
+</div>
+<div>
+<p class="text-sm font-bold text-primary group-hover:underline">Marcus Thorne</p>
+<p class="text-xs text-on-surface-variant">Philosophy Lead</p>
+</div>
+</div>
+<div class="w-2 h-2 rounded-full bg-surface-tint shadow-[0_0_8px_rgba(76,86,175,0.6)]"></div>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-slate-200">
+<img alt="Curator" class="w-full h-full object-cover" data-alt="business woman in smart professional attire with an library in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABSBHV1XU75nCrXJbGnyK9wUkVnOFt3NWMddSTemL4kEuJ4Dr_mj_BJm_k7W_luQcVo23_8B3FhkUwb5DKZFmMosseVjRDI3m3N8iOLFgvLYx_cg7D0k7xBpfj0ogPEXFIHVLUk_KR0U5Z0ekAC9B9qvcEFRsegHqUmlCMDekmo5pK0YCS9yCXlXJ2tiWiYyXtXMKbFb2YKXRiIOJLxXnmFb-yJzINoiCec8eby9Z5UAeY8j9iUcES0t8frUan0NTRUQ6HGHkgS_Wk"/>
+</div>
+<div>
+<p class="text-sm font-bold text-primary group-hover:underline">Dr. Maya Ishi</p>
+<p class="text-xs text-on-surface-variant">Applied Ethics</p>
+</div>
+</div>
+<div class="w-2 h-2 rounded-full bg-surface-tint shadow-[0_0_8px_rgba(76,86,175,0.6)]"></div>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-slate-200">
+<img alt="Curator" class="w-full h-full object-cover" data-alt="headshot of a creative professional with warm evening lighting and a blurry park setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCRVWBmPZEbJhG_wcp9VYXdSkNDBW9MX4pctsuWTfT37AxWjaUSpFH-H20xJlaSRyt1wDpKCwK-xC6T1P3i1AvfQyWnpx1PoBGm3uztaUoZCNcDFF4aws1fK0_pAEljLFsU0TOghbrz8eJketYd1mx-ma5GUWB-k_wTxi_lsKCvAS6u5slzFY08A_mq8oY4VRW-h8hGEs0YvNCg4zEkBXVyR3uhfKRgiy0r4qOVO_yD0C8cFAccHiweDn_6Ya-6fIrGJAw-aNzo2kf"/>
+</div>
+<div>
+<p class="text-sm font-bold text-primary group-hover:underline">Leo Volkov</p>
+<p class="text-xs text-on-surface-variant">Economics</p>
+</div>
+</div>
+<div class="w-2 h-2 rounded-full bg-surface-tint shadow-[0_0_8px_rgba(76,86,175,0.6)]"></div>
+</div>
+</div>
+<button class="w-full mt-8 text-sm font-bold text-[#1A237E] hover:underline">View All Curators</button>
+</div>
+<!-- Sticky Promotional Card -->
+<div class="sticky top-24 bg-gradient-to-br from-[#1A237E] to-primary-container p-8 rounded-xl text-white overflow-hidden relative">
+<div class="relative z-10">
+<h3 class="text-xl font-bold mb-3">Elevate the Discourse</h3>
+<p class="text-white/80 text-sm mb-6 leading-relaxed">Join the Scholarly Circle to access exclusive archives and peer-review privileges.</p>
+<button class="bg-white text-[#1A237E] px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-xl">Upgrade Account</button>
+</div>
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-9xl">school</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="w-full py-12 bg-slate-50 border-t border-slate-100 flex flex-col items-center justify-center gap-4">
+<p class="font-['Inter'] text-xs tracking-wide uppercase text-slate-400">© 2024 The Scholarly Forum. Curating intellect.</p>
+<div class="flex gap-8">
+<a class="text-slate-500 hover:text-[#1A237E] transition-colors font-['Inter'] text-xs tracking-wide uppercase" href="#">Ethics Guidelines</a>
+<a class="text-slate-500 hover:text-[#1A237E] transition-colors font-['Inter'] text-xs tracking-wide uppercase" href="#">Terms of Discourse</a>
+<a class="text-slate-500 hover:text-[#1A237E] transition-colors font-['Inter'] text-xs tracking-wide uppercase" href="#">Library Map</a>
+<a class="text-slate-500 hover:text-[#1A237E] transition-colors font-['Inter'] text-xs tracking-wide uppercase" href="#">Contact</a>
+</div>
+</footer>
+<!-- Mobile Nav Bar (Visible on Small Screens) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white h-16 flex items-center justify-around z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] px-4">
+<button class="flex flex-col items-center text-[#1A237E]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_max</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center text-slate-400">
+<span class="material-symbols-outlined">forum</span>
+<span class="text-[10px] font-bold">Threads</span>
+</button>
+<button class="w-12 h-12 -mt-10 bg-primary rounded-full text-white flex items-center justify-center shadow-lg border-4 border-white">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="flex flex-col items-center text-slate-400">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-[10px] font-bold">Alerts</span>
+</button>
+<button class="flex flex-col items-center text-slate-400">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold">Profile</span>
+</button>
+</nav>
+</body></html>
