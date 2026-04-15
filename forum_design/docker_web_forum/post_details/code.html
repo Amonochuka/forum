@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Post Details | The Scholarly Forum</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1b1b21",
+                        "surface-container-high": "#eae7ef",
+                        "outline": "#767683",
+                        "on-surface-variant": "#454652",
+                        "tertiary-container": "#4f2400",
+                        "surface-container-highest": "#e4e1ea",
+                        "inverse-primary": "#bdc2ff",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#311300",
+                        "tertiary-fixed": "#ffdcc6",
+                        "on-secondary-fixed-variant": "#354a53",
+                        "surface-container": "#efecf5",
+                        "on-primary-fixed": "#000767",
+                        "tertiary": "#301300",
+                        "on-primary-fixed-variant": "#343d96",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#303036",
+                        "inverse-on-surface": "#f2eff8",
+                        "surface-bright": "#fbf8ff",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#fbf8ff",
+                        "tertiary-fixed-dim": "#ffb786",
+                        "outline-variant": "#c6c5d4",
+                        "on-secondary-fixed": "#071e27",
+                        "surface": "#fbf8ff",
+                        "primary": "#000666",
+                        "on-tertiary-container": "#ec7700",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e4e1ea",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1b1b21",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#e0e0ff",
+                        "secondary": "#4c616c",
+                        "primary-fixed-dim": "#bdc2ff",
+                        "surface-container-low": "#f5f2fb",
+                        "primary-container": "#1a237e",
+                        "secondary-fixed": "#cfe6f2",
+                        "on-tertiary-fixed-variant": "#723600",
+                        "on-primary-container": "#8690ee",
+                        "surface-dim": "#dbd9e1",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#4c56af",
+                        "secondary-container": "#cfe6f2",
+                        "on-secondary-container": "#526772",
+                        "secondary-fixed-dim": "#b4cad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbf8ff;
+            color: #1b1b21;
+        }
+        h1, h2, h3, .brand-font {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0_12px_40px_rgba(27,27,33,0.06)] dark:shadow-none flex justify-between items-center px-8 h-16 max-w-full mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold font-['Manrope'] text-[#1A237E] dark:text-white">The Scholarly Forum</span>
+<div class="hidden lg:flex items-center gap-6">
+<a class="font-['Manrope'] font-semibold tracking-tight text-sm text-[#1A237E] dark:text-white border-b-2 border-[#1A237E] pb-1" href="#">Discussions</a>
+<a class="font-['Manrope'] font-semibold tracking-tight text-sm text-slate-500 dark:text-slate-400 hover:text-[#1A237E] transition-colors" href="#">Categories</a>
+<a class="font-['Manrope'] font-semibold tracking-tight text-sm text-slate-500 dark:text-slate-400 hover:text-[#1A237E] transition-colors" href="#">Curators</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full">
+<span class="material-symbols-outlined text-outline text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48" placeholder="Search threads..." type="text"/>
+</div>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all">settings</button>
+<button class="hidden md:block px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full font-semibold text-sm scale-95 active:scale-90 transition-transform">New Post</button>
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full border-2 border-surface-container-high" data-alt="professional male profile portrait with warm natural lighting and soft blurred office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjrAIAJYVBvT81msoR68Yxo1um-_w9aX0lIGgzIyFwLrz88NuO3KVlNtCXOzRixCOwzL15ogVPfUdCbB8fmcOpzUTYWGEK2mVEcaLtmGcOE6NJEsMMY34gmO1oWIyV6IKMca99UmKz-82aYfoNrI4HMwBlZW8Ys5GjTsMHSmS9d_VJInkfqLsiH4RubfscRfUETNgIVj6JH18N1thU4jcj6fnCsUEulz6b7AZALmaCkQWO-qKnnI5eknoD30ltHMDhtQpDv_5ALi3S"/>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 hidden md:flex flex-col gap-2 p-6 pt-24 bg-[#f5f2fb] dark:bg-slate-900 font-['Inter'] font-medium text-sm">
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">auto_stories</span>
+</div>
+<div>
+<p class="font-['Manrope'] font-black text-lg text-[#1A237E] leading-none">The Curator</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">Civil Discourse</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">home_max</span> Home Feed
+            </a>
+<a class="flex items-center gap-3 bg-white dark:bg-slate-800 text-[#1A237E] dark:text-white font-bold rounded-lg px-4 py-3 shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">forum</span> My Threads
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">favorite</span> Liked Posts
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">auto_awesome_motion</span> Collections
+            </a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">history_edu</span> Archives
+            </a>
+</nav>
+<div class="mt-8">
+<button class="w-full py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl font-bold flex items-center justify-center gap-2">
+                Join Community
+            </button>
+</div>
+<div class="mt-auto flex flex-col gap-1 pt-4 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 text-slate-500 text-xs px-4 py-2 hover:text-primary" href="#">
+<span class="material-symbols-outlined text-sm">help</span> Help Center
+            </a>
+<a class="flex items-center gap-3 text-slate-500 text-xs px-4 py-2 hover:text-primary" href="#">
+<span class="material-symbols-outlined text-sm">policy</span> Privacy
+            </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-24 pb-12 px-4 md:px-12 bg-surface">
+<div class="max-w-4xl mx-auto">
+<!-- Article Header -->
+<header class="mb-10">
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">Philosophy</span>
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold uppercase tracking-wider rounded-md">Trending</span>
+</div>
+<h1 class="text-4xl md:text-5xl font-extrabold text-on-surface leading-tight mb-8">The Architecture of Silence: Designing for Intellectual Depth in a Loud Digital World</h1>
+<div class="flex items-center justify-between py-6 border-y border-outline-variant/20">
+<div class="flex items-center gap-4">
+<img alt="Author" class="w-12 h-12 rounded-full border-2 border-surface-tint" data-alt="close-up portrait of a thoughtful woman with artistic lighting in a minimalist studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClQXw0n3aslJXqXjpA2PMBwfoyLva59O2HUetocGkNebLd9ENI8hZeDT-QHMIiVThN8xM7LuCzYhs5HFdEnl_klvCEjIaNK5fPmRNgmTta4mQekZ7H38Nyti21uLpZzRqRLPgJR0UTFWgeABvNAi9bILf6Xb9oa6uvUNhmInsvZorsmy8-OX1_Vy5wQZRKvsh65m3GVJ0mG8qat7GI3PjaC42L_ElckzThGZcpcK57IzVEkgacWQh_aiw2YXjWWiHpNoBYMzMfyare"/>
+<div>
+<p class="font-bold text-on-surface">Dr. Elena Vance</p>
+<p class="text-xs text-on-surface-variant font-medium">Curator of Digital Ethics • Oct 24, 2024</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-sm font-semibold">
+<span class="material-symbols-outlined text-lg">share</span> Share
+                        </button>
+<button class="material-symbols-outlined p-2 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors">bookmark</button>
+</div>
+</div>
+</header>
+<!-- Article Body -->
+<article class="prose prose-slate max-w-none mb-16">
+<div class="aspect-[21/9] w-full rounded-2xl overflow-hidden mb-12 shadow-sm">
+<img alt="Hero Content Image" class="w-full h-full object-cover" data-alt="minimalist architectural interior with clean lines, soft natural sunlight streaming through tall windows, and deep shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAl9PEM3T-Y8uJbGPZuE_DsnhAr7dh17w0JBqPOpoB5cbU5SdqpPVQngP3RFP8ke0RZCOBmmKllTL2Yrd4KZuNaDQOm9uEeFkHs1xsLpm3pAYz3j0TdBKn6HjeU7UIqKGddta3MVikSPdVGs3vPS8U6cWEI3GXywBlIEjx8VzzPIOodoYOJIsYCVWdQ0INc9KPhm4Gu9YsYNMa3K9zzxF3e6EuWHDnChavMoJoW1z1rpoEegLJC3wu767yTBmVANvd7O9xcNI1ZUOms"/>
+</div>
+<div class="space-y-6 text-lg leading-[1.8] text-on-surface font-['Inter']">
+<p class="first-letter:text-5xl first-letter:font-bold first-letter:mr-3 first-letter:float-left first-letter:text-primary">In the cacophony of modern social media, the most valuable luxury has become silence. Not the absence of sound, but the presence of focus. When we look at the evolution of online discourse, we see a trajectory that favors the immediate over the profound, the reactionary over the reflective.</p>
+<h2 class="text-2xl font-bold font-['Manrope'] text-primary mt-12 mb-4">The Tonal Layering of Thought</h2>
+<p>We must treat our digital interfaces as physical spaces. Just as a library uses high ceilings and soft lighting to encourage a specific behavior, our UI should utilize tonal depth to signify importance. By removing the harsh borders of 2010-era design, we allow content to breathe and discussions to feel like ongoing collaborations rather than static records.</p>
+<blockquote class="border-l-4 border-primary bg-surface-container-low px-8 py-6 rounded-r-xl italic text-on-surface-variant font-medium">
+                        "The interface is not just a tool for navigation; it is the atmospheric container for human thought."
+                    </blockquote>
+<p>When we design with 'Architectural Clarity,' we are making a choice to honor the intelligence of the user. We assume they have the attention span for long-form content, and we reward that attention with an interface that remains silent until spoken to.</p>
+</div>
+<div class="mt-12 flex flex-wrap gap-4">
+<button class="flex items-center gap-2 px-6 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-headline font-bold text-primary">1.2k</span>
+</button>
+<button class="flex items-center gap-2 px-6 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">forum</span>
+<span class="font-headline font-bold text-primary">84</span>
+</button>
+</div>
+</article>
+<!-- Comments Section -->
+<section class="mt-16 pt-16 border-t border-outline-variant/20">
+<div class="flex items-center justify-between mb-10">
+<h3 class="text-2xl font-bold font-['Manrope']">Discourse (84)</h3>
+<div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg text-xs font-semibold">
+<span class="text-on-surface-variant">Sort by:</span>
+<select class="bg-transparent border-none focus:ring-0 p-0 text-primary font-bold">
+<option>Best</option>
+<option>Newest</option>
+<option>Oldest</option>
+</select>
+</div>
+</div>
+<!-- Comment Input -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm mb-12 border-b-2 border-primary">
+<div class="flex items-start gap-4">
+<img alt="User Avatar" class="w-10 h-10 rounded-full" data-alt="professional male profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnfqHmRthqmrGYAd4O1UcdlVRUFzW3K8PeKddXZWVDraujkYZ11qD1bRtQI3FMNgYYFhAEE_42Z9lRGRZ-dRNLWS_zFUY-_M_0z75LZqSctjdei4mnj9GYG3mW64uxDeGhAhpP0mD9AotpwjPLwcXoKdZMt6ByFckOhswoAkK-2UcHN4Ig-xp1Zmg13kDqPiYJuxRbcvRqjA7xEA8FAIahgbp1oin-tUmuvGEkwmhja5A7KD15udDpswrMn8YzOY7pK7U1wSva-ST8"/>
+<div class="flex-1">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-on-surface-variant resize-none h-24 font-['Inter']" placeholder="Contribute to the discourse..."></textarea>
+<div class="flex justify-between items-center mt-4">
+<div class="flex gap-2">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary">format_bold</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary">format_italic</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary">link</button>
+</div>
+<button class="px-8 py-2.5 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full font-bold text-sm shadow-md">Post Comment</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Individual Comments -->
+<div class="space-y-6">
+<!-- Comment 1 -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 transition-all border border-transparent hover:border-outline-variant/10">
+<div class="flex items-start gap-4">
+<img alt="User" class="w-10 h-10 rounded-full" data-alt="portrait of a man with spectacles in a library setting, warm interior lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9hogSPwAQebB-q-jI_1OS2OGE7hMJcgmxavb6hzZVuGV_fzJ_u5ubSMcuUiKtWSrAEQgjVJ5-wELWSaWUdhOBHnDArlHm3MxmQG9nNCyFv2ZzuUCSMnBfvanu_1PO2XgjryNUlSu2TaOqXENbTBAVb-xREtyt9CmEyAEfQEPT9uDUuhUjPpeLe-yemhnF917dqpfm0Y-hPnRB4Hg6FZR6Y8YQzPOJ3bhqkImkk-tHrJ4bpdMfRKvSB2Wgr8IM_sJqLRyQcigoL8ZB"/>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-on-surface">Julian Thorne</span>
+<span class="px-2 py-0.5 bg-secondary-container/50 text-on-secondary-container text-[9px] font-black uppercase rounded">Top Contributor</span>
+<span class="text-[10px] text-on-surface-variant ml-auto">2 hours ago</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed text-sm mb-4">This aligns perfectly with the 'Slow Web' movement. The emphasis on tonal layering rather than hard borders creates a cognitive ease that most platforms ignore in favor of 'engagement' metrics. We need more architecture that respects our cognitive load.</p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5">
+<button class="material-symbols-outlined text-lg text-on-surface-variant hover:text-primary">thumb_up</button>
+<span class="text-xs font-headline font-bold">142</span>
+<button class="material-symbols-outlined text-lg text-on-surface-variant hover:text-error">thumb_down</button>
+</div>
+<button class="text-xs font-bold text-primary hover:underline">Reply</button>
+<button class="material-symbols-outlined text-lg text-on-surface-variant ml-auto">more_horiz</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Comment 2 (Reply) -->
+<div class="ml-12 bg-surface-container-low/50 rounded-2xl p-6 transition-all">
+<div class="flex items-start gap-4">
+<img alt="User" class="w-10 h-10 rounded-full" data-alt="professional woman in corporate setting with a warm smile and clear focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGdqUv4ZbL80D4R4bzNkqCLCsUZI1E2mUfS0UL5Zwwgg-jzGTWBqRIc7cihmZuLghaftpmfhWE1InfZtxzKdj85UVbsXpeo27XOu5k3_nEjyNyX5E2mj80XscmNRlprZjayO-XwnIo3qAvms-ZNqVOR45cBNJnh1h5mvh200TTB8eynM3eJMZXc8wbqL1Qi141oyneLQMv5bxf4555674SRTsngXGizF8Y0ZgrFDnXBk1JrsJQuk_1noEgmtXfMpLnLV9waH217oRE"/>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-on-surface">Sarah Chen</span>
+<span class="text-[10px] text-on-surface-variant ml-auto">45 minutes ago</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed text-sm mb-4">Exactly, Julian. The 'Activity Glow' mentioned in the design system is a great touch—it signals presence without the urgent, anxiety-inducing red dots we see elsewhere.</p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5">
+<button class="material-symbols-outlined text-lg text-on-surface-variant hover:text-primary">thumb_up</button>
+<span class="text-xs font-headline font-bold">28</span>
+<button class="material-symbols-outlined text-lg text-on-surface-variant hover:text-error">thumb_down</button>
+</div>
+<button class="text-xs font-bold text-primary hover:underline">Reply</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Comment 3 -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 transition-all border border-transparent hover:border-outline-variant/10">
+<div class="flex items-start gap-4">
+<img alt="User" class="w-10 h-10 rounded-full" data-alt="portrait of a bearded man outdoors with soft morning sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8ADHezaPPBI0BGPjzNnQSHFD2JCU58qMYSeXrMDjPPZ99IkzSO8f7UTH2mRNpiF67ZWTqKP9tZ0A2cIfmCqa73dOyBihGPikhACp_mg2vg2CwxM9NOn18xjdUaWsEMCauDxsvAFABRx1f82qs_f298b1wzJrr8J1a72q0y68ir92jg9svCqFU9l14ga5NmiFgAH9VfcUIdo9g3e8enTPdslXxd9DgeWEqJCaekfDoP7rO8PkBIuBUtkRgYVKaNoOWQTUy0AVBaW9X"/>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-on-surface">Marcus Aurel</span>
+<span class="text-[10px] text-on-surface-variant ml-auto">5 hours ago</span>
+</div>
+<p class="text-on-surface-variant leading-relaxed text-sm mb-4">How do we balance this 'silence' with the need for accessibility? Sometimes tonal shifts are too subtle for low-vision users. I'd love to see how the 'Ghost Border Fallback' is implemented in practice.</p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5">
+<button class="material-symbols-outlined text-lg text-on-surface-variant hover:text-primary">thumb_up</button>
+<span class="text-xs font-headline font-bold">56</span>
+<button class="material-symbols-outlined text-lg text-on-surface-variant hover:text-error">thumb_down</button>
+</div>
+<button class="text-xs font-bold text-primary hover:underline">Reply</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12 flex justify-center">
+<button class="px-8 py-3 rounded-full border-2 border-outline-variant text-on-surface-variant font-bold text-sm hover:bg-surface-container transition-colors">Load More Conversations</button>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 mt-auto bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center gap-4 w-full border-t border-slate-100 dark:border-slate-800">
+<div class="flex gap-8 mb-4">
+<a class="font-['Inter'] text-xs tracking-wide uppercase text-slate-500 hover:text-[#1A237E] transition-colors" href="#">Ethics Guidelines</a>
+<a class="font-['Inter'] text-xs tracking-wide uppercase text-slate-500 hover:text-[#1A237E] transition-colors" href="#">Terms of Discourse</a>
+<a class="font-['Inter'] text-xs tracking-wide uppercase text-slate-500 hover:text-[#1A237E] transition-colors" href="#">Library Map</a>
+<a class="font-['Inter'] text-xs tracking-wide uppercase text-slate-500 hover:text-[#1A237E] transition-colors" href="#">Contact</a>
+</div>
+<p class="font-['Inter'] text-xs tracking-wide uppercase text-slate-400 dark:text-slate-600">© 2024 The Scholarly Forum. Curating intellect.</p>
+</footer>
+</body></html>
