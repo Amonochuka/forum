@@ -3,6 +3,7 @@ package comment
 import (
 	"database/sql"
 	"errors"
+	"strings"
 )
 
 var (
@@ -79,12 +80,15 @@ func (r *sqliteRepo) Create(comment *Comment) error {
 		comment.Content,
 	)
 	if err != nil {
-		return err
+		if isConstraintError(err) {
+			return ErrInvalidRef
+		}
+		return ErrInternal
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return err
+		return ErrInternal
 	}
 
 	comment.ID = int(id)
@@ -115,11 +119,16 @@ func (r *sqliteRepo) GetTopLevelByPostWithReactions(postID, limit, offset int) (
 
 	rows, err := r.db.Query(query, postID, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, ErrInternal
 	}
 	defer rows.Close()
 
-	return scanComments(rows)
+	comments, err := scanComments(rows)
+	if err != nil {
+		return nil, ErrInternal
+	}
+
+	return comments, nil
 }
 
 func (r *sqliteRepo) GetRepliesByParentIDWithReactions(parentID int) ([]Comment, error) {
@@ -141,11 +150,16 @@ func (r *sqliteRepo) GetRepliesByParentIDWithReactions(parentID int) ([]Comment,
 
 	rows, err := r.db.Query(query, parentID)
 	if err != nil {
-		return nil, err
+		return nil, ErrInternal
 	}
 	defer rows.Close()
 
-	return scanComments(rows)
+	comments, err := scanComments(rows)
+	if err != nil {
+		return nil, ErrInternal
+	}
+
+	return comments, nil
 }
 
 func scanComments(rows *sql.Rows) ([]Comment, error) {
@@ -175,4 +189,12 @@ func scanComments(rows *sql.Rows) ([]Comment, error) {
 	}
 
 	return comments, nil
+}
+
+func isConstraintError(err error) bool {
+    var sqliteErr interface{ Error() string }
+    if errors.As(err, &sqliteErr) {
+        return strings.Contains(sqliteErr.Error(), "FOREIGN KEY constraint failed")
+    }
+    return false
 }
