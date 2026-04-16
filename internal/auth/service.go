@@ -1,6 +1,10 @@
 package auth
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"errors"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type Service struct {
 	Repo *Repository
@@ -11,6 +15,10 @@ func NewService(repo *Repository) *Service {
 }
 
 func (s *Service) Register(user User) error {
+	_, err := s.Repo.GetUserByEmail(user.Email)
+	if err == nil {
+		return errors.New("email already exists")
+	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -22,11 +30,7 @@ func (s *Service) Register(user User) error {
 func (s *Service) Login(email, password string) (User, error) {
 	user, err := s.Repo.GetUserByEmail(email)
 	if err != nil {
-		return User{}, err
-	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil {
-		return User{}, err
+		return User{}, errors.New("Invalid email or password")
 	}
 	return user, nil
 }
