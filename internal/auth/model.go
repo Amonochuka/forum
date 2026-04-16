@@ -2,7 +2,7 @@ package auth
 
 import "time"
 
-type user struct {
+type User struct {
 	ID int
 	Username string
 	Email string
