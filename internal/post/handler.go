@@ -27,12 +27,16 @@ func (handler *PostHandler) HandlePosts(w http.ResponseWriter, r *http.Request) 
 }
 //returns a list of posts
 func (handler *PostHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
-	posts, err := handler.service.GetAllPosts()
+	category := r.URL.Query().Get("category") //filter by category
+	user := r.URL.Query().Get("user") // filter by user
+
+	posts, err := handler.service.GetAllPosts(category, user)
 	if err != nil {
 		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
 		return
 	}
 
+	w.Header().Set("content-type","application/json")
 	json.NewEncoder(w).Encode(posts)
 }
 
