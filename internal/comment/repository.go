@@ -1,11 +1,22 @@
 package comment
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+)
+
+var (
+    ErrNotFound   = errors.New("not found")
+    ErrInvalidRef = errors.New("invalid reference")
+    ErrConflict   = errors.New("conflict")
+    ErrInternal   = errors.New("internal error")
+)
 
 type Repository interface {
 	Create(comment *Comment) error
 	GetTopLevelByPostWithReactions(postID, limit, offset int) ([]Comment, error)
 	GetRepliesByParentIDWithReactions(parentID int) ([]Comment, error)
+	GetByID(id int) (*Comment, error)
 }
 
 type sqliteRepo struct {
@@ -16,7 +27,46 @@ func NewRepository(db *sql.DB) Repository {
 	return &sqliteRepo{db: db}
 }
 
-// TODO: Return custom repository errors as opposed to database errorrs
+// TODO: Return custom repository errors as opposed to database errors
+
+func (r *sqliteRepo) GetByID(id int) (*Comment, error) {
+	query := `
+		SELECT
+			id, 
+			user_id, 
+			post_id, 
+			parent_id,
+			content, 
+			created_at,
+		FROM comments
+		WHERE id = ?
+	`
+
+	var c Comment
+	var parentID sql.NullInt64
+
+	err := r.db.QueryRow(query, id).Scan(
+		&c.ID,
+		&c.UserID,
+		&parentID,
+		&c.PostID,
+		&c.Content,
+		&c.CreatedAt,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, ErrInternal
+	}
+
+	if parentID.Valid {
+		pid := int(parentID.Int64)
+		c.ParentID = &pid
+	}
+
+	return &c, nil
+}
 
 func (r *sqliteRepo) Create(comment *Comment) error {
 	query := `INSERT INTO comments (user_id, post_id, parent_id, content) VALUES (?, ?, ?, ?)`
@@ -48,11 +98,11 @@ func (r *sqliteRepo) Create(comment *Comment) error {
 func (r *sqliteRepo) GetTopLevelByPostWithReactions(postID, limit, offset int) ([]Comment, error) {
 	query := `
 		SELECT 
-		c.id, 
-		c.user_id, 
-		c.post_id, 
-		c.content, 
-		c.created_at,
+			c.id, 
+			c.user_id, 
+			c.post_id, 
+			c.content, 
+			c.created_at,
 		COALESCE(SUM(CASE WHEN rx.reaction_type = 1 THEN 1 ELSE 0 END), 0) AS likes,
 		COALESCE(SUM(CASE WHEN rx.reaction_type = -1 THEN 1 ELSE 0 END), 0) AS dislikes
 		FROM comments c
