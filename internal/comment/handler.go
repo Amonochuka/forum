@@ -2,22 +2,18 @@ package comment
 
 import (
 	"errors"
-	"forum/internal/auth"
+	"forum/internal/session"
+	"forum/internal/shared/middleware"
 	"net/http"
 	"strconv"
 )
 
-// TODO: Replace with actual session service
-type sessionService interface {
-	GetUserFromRequest(r *http.Request) (*auth.User, error)
-}
-
 type Handler struct {
 	service        Service
-	sessionService sessionService
+	sessionService *session.Service
 }
 
-func NewHandler(service Service, sessionService sessionService) *Handler {
+func NewHandler(service Service, sessionService *session.Service) *Handler {
 	return &Handler{service: service, sessionService: sessionService}
 }
 
@@ -54,16 +50,15 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Swap this out when session service is available
-	user, err := h.sessionService.GetUserFromRequest(r)
-	if err != nil {
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	content := r.FormValue("content")
 
-	if err := h.service.CreateComment(user.ID, postID, content, nil); err != nil {
+	if err := h.service.CreateComment(userID, postID, content, nil); err != nil {
 		switch {
 		case errors.Is(err, ErrEmptyContent):
 			http.Error(w, "comment cannot be empty", http.StatusBadRequest)
@@ -109,9 +104,8 @@ func (h *Handler) CreateReply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Swap this out when session service is available
-	user, err := h.sessionService.GetUserFromRequest(r)
-	if err != nil {
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -123,7 +117,7 @@ func (h *Handler) CreateReply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.service.CreateComment(user.ID, postID, content, &parentID); err != nil {
+	if err := h.service.CreateComment(userID, postID, content, &parentID); err != nil {
 		switch {
 		case errors.Is(err, ErrEmptyContent):
 			http.Error(w, "reply cannot be empty", http.StatusBadRequest)
