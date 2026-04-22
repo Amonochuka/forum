@@ -14,8 +14,6 @@ import (
 )
 
 func main() {
-	mux := http.NewServeMux()
-
 	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
 		log.Fatal(err)
@@ -38,8 +36,8 @@ func main() {
 	commentRepo := comment.NewRepository(db)
 	commentService := comment.NewService(commentRepo)
 	commentHandler := comment.NewHandler(commentService, sessionService)
-	comment.RegisterRoutes(mux, commentHandler, requireAuth)
+	comment.RegisterRoutes(commentHandler, requireAuth)
 
 	log.Println("🚀 Server running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
