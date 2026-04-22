@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	log.Println("STARTING SERVER...")
 	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
 		log.Fatal(err)
