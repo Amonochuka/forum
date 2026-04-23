@@ -46,3 +46,6 @@ func (s *Service) ValidateSession(token string) (int, error) {
 	}
 	return userID, nil
 }
+func (s *Service) DeleteSession(token string) error {
+	return s.repo.Delete(token)
+}
