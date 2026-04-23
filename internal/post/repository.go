@@ -151,16 +151,30 @@ func (r *CategoryRepository) GetCategoryIDByName(name string) (int, error) {
 	return id, nil
 }
 
-func (r *CategoryRepository) GetByPostID(ID int) (int, error) {
-	var postID int
-
-	err := r.db.QueryRow(`SELECT id from post WHERE id = ?
-	`,ID) .Scan(&postID)
-
+func (r *CategoryRepository) GetByPostID(postID int) ([]Category, error) {
+	rows, err := r.db.Query(`
+		SELECT c.id, c.name
+		FROM categories c
+		JOIN post_categories pc ON c.id = pc.category_id
+		WHERE pc.post_id = ?
+	`, postID)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return postID, nil
+	defer rows.Close()
+
+	var categories []Category
+
+	for rows.Next() {
+		var c Category
+		err := rows.Scan(&c.ID, &c.Name)
+		if err != nil {
+			return nil, err
+		}
+		categories = append(categories, c)
+	}
+
+	return categories, nil
 }
 
 func (r *UserRepository) GetUsernameByID(userID int) (string, error) {
