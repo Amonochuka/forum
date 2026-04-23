@@ -5,19 +5,21 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"forum/internal/shared/middleware"
 )
 
 type PostHandler struct {
-	service        *PostService // getting logged-in users
-	sessionService *SessionService
+	service        *PostService 
 }	
 
 type CreatePostRequest struct {
 	Title string `json:"Title"`
 	Content string `json:"Content"`
-	Category string `json:"category"`
+	Category []string `json:"category"`
 
 }
+
+
 // Routes inside the Handler it get to decide which action to take based on the http method.
 func (handler *PostHandler) HandlePosts(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -72,32 +74,24 @@ func (handler *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
-	// getting session cookie
-	cookie, err := r.Cookie("session_id")
-	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	// Validate session
-	User, err := handler.sessionService.ValidateSession(cookie.Value)
-	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// parsing request body
 	var req CreatePostRequest
-	err = json.NewDecoder(r.Body).Decode(&req)
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, "Invalid Request", http.StatusBadRequest)
+		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
-	// Calling service
-	err = handler.service.CreatePost(User.ID, req.Title, req.Content, req.Category)
+
+	err = handler.service.CreatePost(userID, req.Title, req.Content, req.Category)
 	if err != nil {
 		http.Error(w, "Failed to create post", http.StatusInternalServerError)
 		return
 	}
+
 	w.WriteHeader(http.StatusCreated)
 }
