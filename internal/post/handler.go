@@ -2,21 +2,22 @@ package post
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+
 	"forum/internal/shared/middleware"
 )
 
 type PostHandler struct {
-	Service        *PostService 
-}	
+	Service *PostService
+}
 
 type CreatePostRequest struct {
-	Title string `json:"Title"`
-	Content string `json:"Content"`
+	Title    string   `json:"Title"`
+	Content  string   `json:"Content"`
 	Category []string `json:"category"`
-
 }
 
 func NewPostHandler(service *PostService) *PostHandler {
@@ -39,17 +40,22 @@ func (handler *PostHandler) HandlePosts(w http.ResponseWriter, r *http.Request) 
 
 // returns a list of posts
 func (handler *PostHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
-	category := r.URL.Query().Get("category") // filter by category
-	user := r.URL.Query().Get("user")         // filter by user
+	category := r.URL.Query().Get("category")
+	user := r.URL.Query().Get("user")
 
 	posts, err := handler.Service.GetPosts(category, user)
 	if err != nil {
+		fmt.Println("Error:",err)
 		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(posts)
+	w.Header().Set("Content-Type", "application/json")
+
+	if err := json.NewEncoder(w).Encode(posts); err != nil {
+		http.Error(w, "JSON encode error", http.StatusInternalServerError)
+		return
+	}
 }
 
 // return a single post by that specific id

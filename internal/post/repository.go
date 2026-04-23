@@ -18,7 +18,12 @@ type UserRepository struct {
 func NewPostRepository(db *sql.DB) *PostRepository {
 	return &PostRepository{db: db}
 }
-
+func NewCategoryRepository(db *sql.DB) *CategoryRepository {
+	return &CategoryRepository{db: db}
+}
+func NewUserRepository(db *sql.DB) *UserRepository {
+	return &UserRepository{db: db}
+}
 func (r *PostRepository) GetPost() ([]Post, error) {
 	row, err := r.db.Query("SELECT id, user_id, title, content, created_at FROM posts")
 	if err != nil {
@@ -31,7 +36,7 @@ func (r *PostRepository) GetPost() ([]Post, error) {
 	for row.Next() {
 		var p Post
 
-		row.Scan(&p.ID, &p.Title, &p.Content, &p.CreatedAt)
+		row.Scan(&p.ID, &p.UserID,&p.Title, &p.Content, &p.CreatedAt)
 		post = append(post, p)
 	}
 	return post, nil

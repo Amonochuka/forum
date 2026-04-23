@@ -1,23 +1,22 @@
 package post
 
 import (
-	"strconv"
 	"errors"
+	"strconv"
 )
 
 type PostService struct {
-	postRepo *PostRepository
-	userRepo *UserRepository
+	postRepo     *PostRepository
+	userRepo     *UserRepository
 	categoryRepo *CategoryRepository
 }
 
-var (
-	ErrEmptyContent = errors.New("content cannot be empty")
-)	
+var ErrEmptyContent = errors.New("content cannot be empty")
 
-func NewPostService(repo *PostRepository) *PostService {
-	return &PostService{postRepo: repo}
+func NewPostService(repo *PostRepository, userRepo *UserRepository, categoryRepo *CategoryRepository) *PostService {
+	return &PostService{postRepo: repo,userRepo:userRepo,categoryRepo: categoryRepo}
 }
+
 func (s *PostService) buildPostResponse(post Post) (PostResponse, error) {
 	username, err := s.userRepo.GetUsernameByID(post.UserID)
 	if err != nil {

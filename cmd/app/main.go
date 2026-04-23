@@ -41,7 +41,10 @@ func main() {
 //post
 
 	postRepo:= post.NewPostRepository(db)
-	postservice := post.NewPostService(postRepo)
+	userRepo:= post.NewUserRepository(db)
+	catRepo:= post.NewCategoryRepository(db)
+
+	postservice := post.NewPostService(postRepo,userRepo,catRepo)
 	posthandler := post.NewPostHandler(postservice)
 	post.RegisterPostRoutes(posthandler, requireAuth)
 	
