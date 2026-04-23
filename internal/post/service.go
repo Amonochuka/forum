@@ -1,10 +1,19 @@
 package post
 
-import "strconv"
+import (
+	"strconv"
+	"errors"
+)
 
 type PostService struct {
 	postRepo *PostRepository
+	userRepo *UserRepository
+	categoryRepo *CategoryRepository
 }
+
+var (
+	ErrEmptyContent = errors.New("content cannot be empty")
+)	
 
 func (s *PostService) buildPostResponse(post Post) (PostResponse, error) {
 	username, err := s.userRepo.GetUsernameByID(post.UserID)
@@ -12,7 +21,7 @@ func (s *PostService) buildPostResponse(post Post) (PostResponse, error) {
 		return PostResponse{}, err
 	}
 
-	categories, err := s.categoryRepo.GetByPostId(post.ID)
+	categories, err := s.categoryRepo.GetByPostID(post.ID)
 	if err != nil {
 		return PostResponse{}, err
 	}
@@ -69,4 +78,34 @@ func (s *PostService) GetPostByID(id int) (PostResponse, error) {
 	}
 
 	return s.buildPostResponse(post)
+}
+
+func (s *PostService) CreatePost(userID int, title, content string, categories []string) error {
+	// Basic validation
+	if title == "" || content == "" {
+		return ErrEmptyContent
+	}
+
+	// 1. Create post
+	postID, err := s.postRepo.CreatePost(userID, title, content)
+	if err != nil {
+		return err
+	}
+
+	// 2. Attach categories
+	for _, catName := range categories {
+		// get category ID
+		catID, err := s.categoryRepo.GetCategoryIDByName(catName)
+		if err != nil {
+			return err
+		}
+
+		// link post ↔ category
+		err = s.postRepo.AddPostCategory(postID, catID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
