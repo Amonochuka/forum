@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Scholarly Forum</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: Inter, sans-serif; }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+<!-- Navbar -->
+<header class="bg-white border-b">
+  <div class="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+    <h1 class="text-xl font-bold text-indigo-700">The Scholarly Forum</h1>
+
+    <nav class="space-x-6 text-sm font-medium">
+      <a href="/" class="text-indigo-700">Home</a>
+      <a href="/login" class="text-gray-600 hover:text-indigo-700">Login</a>
+      <a href="/register" class="text-gray-600 hover:text-indigo-700">Register</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-6xl mx-auto px-6 py-12">
+  <h2 class="text-3xl font-bold mb-3">Thoughtful discussion, curated.</h2>
+  <p class="text-gray-600 max-w-2xl">
+    A place for meaningful conversations across philosophy, science, art, and history.
+  </p>
+</section>
+
+<!-- Feed -->
+<main class="max-w-6xl mx-auto px-6 pb-16 space-y-6">
+
+  <!-- Post Card -->
+  <article class="bg-white p-6 rounded-lg border hover:shadow-sm transition">
+    <h3 class="text-xl font-semibold mb-2">
+      Existentialism in the Age of Algorithms
+    </h3>
+
+    <p class="text-gray-600 mb-4">
+      Are we still free thinkers when our choices are shaped by recommendation engines?
+    </p>
+
+    <div class="flex items-center justify-between text-sm text-gray-500">
+      <span>By Elena Moretti • 2 hours ago</span>
+      <div class="flex gap-4">
+        <span>👍 856</span>
+        <span>💬 45</span>
+      </div>
+    </div>
+  </article>
+
+  <!-- Another Post -->
+  <article class="bg-white p-6 rounded-lg border hover:shadow-sm transition">
+    <h3 class="text-xl font-semibold mb-2">
+      Minimalism and Modern Interface Design
+    </h3>
+
+    <p class="text-gray-600 mb-4">
+      How Bauhaus principles quietly shape todays most successful digital products.
+    </p>
+
+    <div class="flex items-center justify-between text-sm text-gray-500">
+      <span>By Julian Vance • 15 minutes ago</span>
+      <div class="flex gap-4">
+        <span>👍 1.2k</span>
+        <span>💬 188</span>
+      </div>
+    </div>
+  </article>
+
+</main>
+
+<!-- Footer -->
+<footer class="bg-white border-t py-6">
+  <div class="max-w-6xl mx-auto px-6 text-center text-sm text-gray-500">
+    © 2026 The Scholarly Forum
+  </div>
+</footer>
+
+</body>
+</html>
