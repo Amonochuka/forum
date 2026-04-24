@@ -15,7 +15,7 @@ func NewRepository(db *sql.DB) *Repository {
 
 func (r *Repository) CreateUser(user User) error {
 	_, err := r.DB.Exec(
-		"INSERT INTO users(username, email, password) VALUES (?, ?, ?)",
+		"INSERT INTO users(username, email, password_hash) VALUES (?, ?, ?)",
 		user.Username,
 		user.Email,
 		user.Password,
@@ -27,7 +27,7 @@ func (r *Repository) GetUserByEmail(email string) (User, error) {
 	var user User
 
 	err := r.DB.QueryRow(
-		"SELECT id, username, email, password, created_at FROM users WHERE email = ?",
+		"SELECT id, username, email, password_hash, created_at FROM users WHERE email = ?",
 		email,
 	).Scan(
 		&user.ID,

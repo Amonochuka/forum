@@ -3,9 +3,9 @@ package auth
 import "time"
 
 type User struct {
-	ID int
-	Username string
-	Email string
-	Password string //hashed
-	CreatedAt time.Time
+	ID        int       `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password_hash"` // hashed
+	CreatedAt time.Time `json:"created_at"`
 }

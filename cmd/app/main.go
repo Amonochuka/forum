@@ -7,6 +7,7 @@ import (
 
 	"forum/internal/auth"
 	"forum/internal/comment"
+	"forum/internal/post"
 	"forum/internal/session"
 	"forum/internal/shared/middleware"
 
@@ -19,40 +20,34 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// repositories
+	// auth
 	authRepo := auth.NewRepository(db)
-	commentRepo := comment.NewRepository(db)
-	sessionRepo := session.NewRepository(db)
-
-	// services
 	authService := auth.NewService(authRepo)
-	sessionService := session.NewService(sessionRepo)
-
-	// handlers
-	authHandler := auth.NewHandler(authService,sessionService)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
-	auth.RegisterRoutes(authHandler)
 
 	// session
+	sessionRepo := session.NewRepository(db)
+	sessionService := session.NewService(sessionRepo)
+	authHandler := auth.NewHandler(authService,sessionService)
+	auth.RegisterRoutes(authHandler)
 
 	requireAuth := middleware.RequireAuth(sessionService)
 
 	// comments
+	commentRepo := comment.NewRepository(db)
 	commentService := comment.NewService(commentRepo)
 	commentHandler := comment.NewHandler(commentService, sessionService)
 	comment.RegisterRoutes(commentHandler, requireAuth)
+//post
 
-	//router
+	postRepo:= post.NewPostRepository(db)
+	userRepo:= post.NewUserRepository(db)
+	catRepo:= post.NewCategoryRepository(db)
 
-	mux:=http.NewServeMux()
-
-	//auth
-
-	mux.HandleFunc("/register", authHandler.Register)
-	mux.HandleFunc("/login",authHandler.Login)
-	//view-only
-	//protected routes
-	//startserver
+	postservice := post.NewPostService(postRepo,userRepo,catRepo)
+	posthandler := post.NewPostHandler(postservice)
+	post.RegisterPostRoutes(posthandler, requireAuth)
+	
 	log.Println("🚀 Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
