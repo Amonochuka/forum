@@ -29,8 +29,6 @@ func NewRepository(db *sql.DB) Repository {
 	return &sqliteRepo{db: db}
 }
 
-// TODO: Return custom repository errors as opposed to database errors
-
 func (r *sqliteRepo) GetByID(id int) (*Comment, error) {
 	query := `
 		SELECT
