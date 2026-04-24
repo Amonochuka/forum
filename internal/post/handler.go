@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
 	"forum/internal/shared/middleware"
 )
 
@@ -59,11 +58,9 @@ func (handler *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	idStr := strings.TrimPrefix(r.URL.Path, "/posts/")
-
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		http.Error(w, "Invalid Post ID", http.StatusBadRequest)
+		http.Error(w, "invalid comment id", http.StatusBadRequest)
 		return
 	}
 
