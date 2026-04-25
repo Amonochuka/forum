@@ -18,6 +18,6 @@ func RegisterRoutes(handler *Handler) {
 		handler.Login(w, r)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/templates/home.html")
+		http.ServeFile(w, r, "web/templates/index.html")
 	})
 }
