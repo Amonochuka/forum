@@ -1,20 +1,57 @@
 package comment
 
 import (
+	"encoding/json"
 	"errors"
-	"forum/internal/session"
-	"forum/internal/shared/middleware"
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
+
+	"forum/internal/session"
+	"forum/internal/shared/middleware"
 )
 
 type Handler struct {
-	service        Service
-	sessionService *session.Service
+	service Service
 }
 
 func NewHandler(service Service, sessionService *session.Service) *Handler {
-	return &Handler{service: service, sessionService: sessionService}
+	return &Handler{service: service}
+}
+
+func formatTime(t time.Time) string {
+	now := time.Now()
+	diff := now.Sub(t)
+
+	switch {
+	case diff < time.Minute:
+		return "just now"
+
+	case diff < time.Hour:
+		return fmt.Sprintf("%d minutes ago", int(diff.Minutes()))
+
+	case diff < 24*time.Hour:
+		return fmt.Sprintf("%d hours ago", int(diff.Hours()))
+
+	case diff < 48*time.Hour:
+		return "yesterday"
+
+	default:
+		return t.Format("02 Jan 2006")
+	}
+}
+
+func toCommentView(c Comment) CommentView {
+	return CommentView{
+		ID:         c.ID,
+		AuthorName: c.Name,
+		Body:       c.Content,
+		Likes:      c.Likes,
+		Dislikes:   c.Dislikes,
+		CreatedAt:  formatTime(c.CreatedAt),
+		ReplyCount: c.ReplyCount,
+	}
 }
 
 // GET /posts/{id}/comments
@@ -32,14 +69,28 @@ func (h *Handler) GetComments(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	comments, err := h.service.GetTopLevelComments(postID, page)
+	comments, count, err := h.service.GetTopLevelComments(postID, page)
 	if err != nil {
 		http.Error(w, "could not fetch comments", http.StatusInternalServerError)
 		return
 	}
 
-	// TODO: Render template with comments
-	_ = comments
+	views := make([]CommentView, 0, len(comments))
+
+	for _, c := range comments {
+		views = append(views, toCommentView(c))
+	}
+
+	resp := struct {
+		Comments []CommentView `json:"comments"`
+		Total    int           `json:"total"`
+	}{
+		Comments: views,
+		Total:    count,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
 }
 
 // POST /posts/{id}/comments
@@ -92,8 +143,20 @@ func (h *Handler) GetReplies(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Render template with replies
-	_ = replies
+	views := make([]CommentView, 0, len(replies))
+
+	for _, r := range replies {
+		views = append(views, toCommentView(r))
+	}
+
+	resp := struct {
+		Replies []CommentView `json:"replies"`
+	}{
+		Replies: views,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
 }
 
 // POST /comments/{id}/replies
