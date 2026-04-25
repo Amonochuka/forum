@@ -36,6 +36,52 @@
   </p>
 </section>
 
+<!-- create post -->
+<section class="max-w-6xl mx-auto px-6 mb-10">
+  <div class="bg-white p-6 rounded-lg border">
+
+    <h3 class="text-lg font-semibold mb-4">Create a Post</h3>
+
+    <form id="postForm" class="space-y-4">
+      
+      <input type="text" id="title" placeholder="Post title"
+        class="w-full border rounded px-4 py-2" required />
+
+      <textarea id="content" placeholder="Write your thoughts..."
+        class="w-full border rounded px-4 py-2" rows="4" required></textarea>
+
+      <div>
+        <span class="block text-sm font-medium text-gray-700 mb-2">Categories</span>
+        <div class="flex flex-wrap gap-4">
+          <label class="inline-flex items-center">
+            <input type="checkbox" name="categories" value="1" class="form-checkbox text-indigo-600 rounded">
+            <span class="ml-2 text-sm text-gray-700">Philosophy</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input type="checkbox" name="categories" value="2" class="form-checkbox text-indigo-600 rounded">
+            <span class="ml-2 text-sm text-gray-700">Science</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input type="checkbox" name="categories" value="3" class="form-checkbox text-indigo-600 rounded">
+            <span class="ml-2 text-sm text-gray-700">Art</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input type="checkbox" name="categories" value="4" class="form-checkbox text-indigo-600 rounded">
+            <span class="ml-2 text-sm text-gray-700">Technology</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit"
+        class="bg-indigo-600 text-white px-6 py-2 rounded">
+        Post
+      </button>
+
+    </form>
+
+  </div>
+</section>
+
 <!-- Feed -->
 <main class="max-w-6xl mx-auto px-6 pb-16 space-y-6">
 
@@ -45,7 +91,7 @@
       Existentialism in the Age of Algorithms
     </h3>
 
-    <p class="text-gray-600 mb-4">
+    <p class="text-gray-600 mb-4"mls>
       Are we still free thinkers when our choices are shaped by recommendation engines?
     </p>
 
@@ -85,6 +131,51 @@
     © 2026 The Scholarly Forum
   </div>
 </footer>
+
+<script>
+document.getElementById("postForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const title = document.getElementById("title").value;
+  const content = document.getElementById("content").value;
+  // Get all checked category checkboxes
+  const categoryCheckboxes = document.querySelectorAll('input[name="categories"]:checked');
+  const categories = Array.from(categoryCheckboxes).map(cb => Number(cb.value));
+
+  const postData = {
+    title: title,
+    content: content,
+    user_id: 1, // hardcode for now (replace later with auth)
+    categories: categories
+  };
+
+  try {
+    const res = await fetch("/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(postData)
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to create post");
+    }
+
+    const data = await res.json();
+    console.log("Post created:", data);
+
+    alert("Post created successfully!");
+
+    // optional: reload page to see it
+    location.reload();
+
+  } catch (err) {
+    console.error(err);
+    alert("Error creating post");
+  }
+});
+</script>
 
 </body>
 </html>
