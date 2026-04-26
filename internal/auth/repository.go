@@ -5,6 +5,12 @@ import (
 	"errors"
 )
 
+var (
+	ErrUserNotFound    = errors.New("user not found")
+	ErrEmailExists     = errors.New("email already exists")
+	ErrInvalidPassword = errors.New("invalid email or password")
+)
+
 type Repository struct {
 	DB *sql.DB
 }
@@ -37,8 +43,8 @@ func (r *Repository) GetUserByEmail(email string) (User, error) {
 		&user.CreatedAt,
 	)
 
-	if err == sql.ErrNoRows {
-		return User{}, errors.New("user not found")
+	if errors.Is(err, sql.ErrNoRows) {
+		return User{}, ErrUserNotFound
 	}
 
 	return user, err
