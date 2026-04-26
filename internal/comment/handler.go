@@ -124,7 +124,7 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 
 	view := toCommentView(*comment)
 
-	resp := struct{
+	resp := struct {
 		CommentView CommentView `json:"comment"`
 	}{
 		CommentView: view,
@@ -209,8 +209,8 @@ func (h *Handler) CreateReply(w http.ResponseWriter, r *http.Request) {
 	}
 
 	view := toCommentView(*comment)
-	
-	resp := struct{
+
+	resp := struct {
 		CommentView CommentView `json:"comment"`
 	}{
 		CommentView: view,
