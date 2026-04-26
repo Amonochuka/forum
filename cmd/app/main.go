@@ -29,7 +29,7 @@ func main() {
 	// session
 	sessionRepo := session.NewRepository(db)
 	sessionService := session.NewService(sessionRepo)
-	authHandler := auth.NewHandler(authService,sessionService)
+	authHandler := auth.NewHandler(authService, sessionService)
 	auth.RegisterRoutes(authHandler)
 
 	requireAuth := middleware.RequireAuth(sessionService)
@@ -39,16 +39,21 @@ func main() {
 	commentService := comment.NewService(commentRepo)
 	commentHandler := comment.NewHandler(commentService, sessionService)
 	comment.RegisterRoutes(commentHandler, requireAuth)
-//post
+	//post
 	postRepo := post.NewPostRepository(db)
 	catRepo := post.NewCategoryRepository(db)
 	userRepo := post.NewUserRepository(db)
 	reactionRepo := &reaction.ReactionRepository{DB: db}
-	
+
 	postservice := post.NewPostService(postRepo, catRepo, userRepo, reactionRepo)
 	posthandler := post.NewPostHandler(postservice)
 	post.RegisterPostRoutes(posthandler, requireAuth)
-	
+
+	// reaction
+	reactionService := &reaction.ReactionService{Repo: reactionRepo}
+	reactionHandler := reaction.NewHandler(reactionService)
+	reaction.RegisterRoutes(reactionHandler, requireAuth)
+
 	log.Println("🚀 Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
