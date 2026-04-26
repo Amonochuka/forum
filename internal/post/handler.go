@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
-
 	"forum/internal/shared/middleware"
 )
 
@@ -42,8 +40,29 @@ func (handler *PostHandler) HandlePosts(w http.ResponseWriter, r *http.Request) 
 func (handler *PostHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
 	category := r.URL.Query().Get("category")
 	user := r.URL.Query().Get("user")
+	liked := r.URL.Query().Get("liked")
 
-	posts, err := handler.Service.GetPosts(category, user)
+	var likedBy string
+	if liked == "true" {
+		userID, ok := middleware.GetUserID(r)
+		if !ok {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		likedBy = strconv.Itoa(userID)
+	}
+
+	// Also support "user=me" for created posts
+	if user == "me" {
+		userID, ok := middleware.GetUserID(r)
+		if !ok {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		user = strconv.Itoa(userID)
+	}
+
+	posts, err := handler.Service.GetPosts(category, user, likedBy)
 	if err != nil {
 		fmt.Println("Error:",err)
 		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
@@ -65,11 +84,9 @@ func (handler *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	idStr := strings.TrimPrefix(r.URL.Path, "/posts/")
-
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		http.Error(w, "Invalid Post ID", http.StatusBadRequest)
+		http.Error(w, "invalid comment id", http.StatusBadRequest)
 		return
 	}
 
@@ -103,4 +120,20 @@ func (handler *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (handler *PostHandler) GetCategories(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	categories, err := handler.Service.GetAllCategories()
+	if err != nil {
+		http.Error(w, "Failed to fetch categories", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(categories)
 }
