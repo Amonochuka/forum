@@ -15,11 +15,12 @@
 
 /* ── Avatar ── */
 .f-avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
 }
 
 /* ── Compose ── */
@@ -40,6 +41,72 @@
   align-self: flex-end;
 }
 
+.f-compose-body > button,
+.f-reply-form > button,
+.f-reply-form > div > button {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.f-compose-body > button,
+.f-reply-form > button:first-of-type,
+.f-reply-form > div > button:first-of-type {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+}
+
+.f-compose-body > button:hover,
+.f-reply-form > button:first-of-type:hover,
+.f-reply-form > div > button:first-of-type:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.f-reply-form > button:last-of-type,
+.f-reply-form > div > button:last-of-type {
+  background: var(--white);
+  color: var(--text-muted);
+}
+
+.f-reply-form > button:last-of-type:hover,
+.f-reply-form > div > button:last-of-type:hover {
+  background: var(--bg-color);
+  color: var(--text-dark);
+}
+
+.f-auth-prompt {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.f-auth-prompt p {
+  margin: 0 0 8px;
+}
+
+.f-auth-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.f-auth-actions a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.f-auth-actions a:hover {
+  color: var(--primary-hover);
+}
+
 /* ── Comment list ── */
 #f-comment-list {
   display: flex;
@@ -49,9 +116,11 @@
 
 /* ── Single comment ── */
 .f-comment {
-  background: var(--bg-color);
+  background: var(--white);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius);
   padding: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .f-comment-header {
@@ -143,6 +212,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.f-replies .f-comment {
+  background: var(--bg-color);
 }
 
 /* ── Load more ── */
