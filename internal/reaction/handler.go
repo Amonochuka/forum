@@ -1,6 +1,7 @@
 package reaction
 
 import (
+	"encoding/json"
 	"forum/internal/shared/middleware"
 	"net/http"
 	"strconv"
@@ -80,8 +81,32 @@ func (h *Handler) React(w http.ResponseWriter, r *http.Request) {
 	// Redirect back
 	ref := r.Referer()
 	if ref == "" {
-		ref = "/" // fallback
+		ref = "/"
+	}
+	http.Redirect(w, r, ref, http.StatusSeeOther)
+}
+
+func (h *Handler) GetCommentReactionCounts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
-	http.Redirect(w, r, ref, http.StatusSeeOther)
+	commentID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, "invalid comment id", http.StatusBadRequest)
+		return
+	}
+
+	likes, dislikes, err := h.ReactionService.GetCommentReactionCounts(commentID)
+	if err != nil {
+		http.Error(w, "could not fetch counts", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(struct {
+		Likes    int `json:"likes"`
+		Dislikes int `json:"dislikes"`
+	}{likes, dislikes})
 }
