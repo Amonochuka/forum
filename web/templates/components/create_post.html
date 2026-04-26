@@ -1,0 +1,34 @@
+{{define "create_post"}}
+<!-- create post -->
+<section class="container">
+  <div class="card">
+    <!-- Form Title -->
+    <h3 class="form-title">Create a Post</h3>
+
+    <!-- Post Creation Form -->
+    <form id="postForm">
+      
+      <div class="form-group">
+        <input type="text" id="title" placeholder="Post title" required />
+      </div>
+
+      <div class="form-group">
+        <textarea id="content" placeholder="Write your thoughts..." rows="4" required></textarea>
+      </div>
+
+      <!-- Category Selection -->
+      <div class="form-group">
+        <span class="form-label">Categories</span>
+        <div id="createPostCategories" class="checkbox-group">
+          <!-- Dynamic checkboxes will be injected here -->
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary">
+        Post
+      </button>
+
+    </form>
+  </div>
+</section>
+{{end}}

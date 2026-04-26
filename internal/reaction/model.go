@@ -7,6 +7,6 @@ type Reaction struct {
 	UserID    int
 	PostID    *int
 	CommentID *int
-	Type      string // "like" or "dislike"
+	Type      int//  1 = like, -1 = dislike
 	CreatedAt time.Time
 }

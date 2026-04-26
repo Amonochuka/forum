@@ -7,29 +7,29 @@ type ReactionService struct {
 }
 
 func (s *ReactionService) React(r *Reaction) error {
-	//validate reaction
+	// validate reaction
 	if (r.PostID == nil && r.CommentID == nil) ||
 		(r.PostID != nil && r.CommentID != nil) {
 		return errors.New("reaction must belong to either post or comment")
 	}
 
-	//check existing reaction
+	// check existing reaction
 	existing, err := s.Repo.GetUserReaction(r.UserID, r.PostID, r.CommentID)
 	if err != nil {
 		return err
 	}
 
-	//insert if there is no reaction
+	// insert if no reaction exists
 	if existing == nil {
 		return s.Repo.AddReaction(r)
 	}
 
-	//delete if reaction is same as before
+	// delete if same reaction (toggle off)
 	if existing.Type == r.Type {
 		return s.Repo.DeleteReaction(r.UserID, r.PostID, r.CommentID)
 	}
 
-	//update of the reaction is different
+	// update if different reaction
 	return s.Repo.UpdateReaction(r)
 }
 
@@ -39,4 +39,12 @@ func (s *ReactionService) GetPostReactions(postID int) ([]*Reaction, error) {
 
 func (s *ReactionService) GetCommentReactions(commentID int) ([]*Reaction, error) {
 	return s.Repo.GetCommentReactions(commentID)
+}
+
+func (s *ReactionService) GetPostReactionCounts(postID int) (int, int, error) {
+	return s.Repo.GetPostReactionCounts(postID)
+}
+
+func (s *ReactionService) GetCommentReactionCounts(commentID int) (int, int, error) {
+	return s.Repo.GetCommentReactionCounts(commentID)
 }

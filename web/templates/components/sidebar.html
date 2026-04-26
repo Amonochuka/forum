@@ -1,0 +1,27 @@
+{{define "sidebar"}}
+  <!-- Sidebar: Categories -->
+  <aside>
+    <div class="card">
+      <h3 class="sidebar-title">Categories</h3>
+      <ul id="categoryList" class="sidebar-nav">
+        <li>
+          <button onclick="loadPosts({})" class="active">
+            All Posts
+          </button>
+        </li>
+        <li>
+          <button onclick="loadPosts({user: 'me'})">
+            👤 My Posts
+          </button>
+        </li>
+        <li>
+          <button onclick="loadPosts({liked: true})">
+            ❤️ Liked Posts
+          </button>
+        </li>
+        <hr class="sidebar-divider">
+        <!-- Categories will be injected here -->
+      </ul>
+    </div>
+  </aside>
+{{end}}

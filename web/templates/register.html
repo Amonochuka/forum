@@ -1,5 +1,3 @@
-
-<!-- ===================== register.html ===================== -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +12,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .card {
       background: #fff;
@@ -29,6 +28,7 @@
       margin-bottom: 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
+      box-sizing: border-box;
     }
     button {
       width: 100%;
@@ -50,16 +50,57 @@
 <body>
   <div class="card">
     <h2>Register</h2>
-    <form>
-      <input type="text" placeholder="Full Name" required />
-      <input type="email" placeholder="Email" required />
-      <input type="password" placeholder="Password" required />
-      <input type="password" placeholder="Confirm Password" required />
+    <form id="regForm">
+      <input type="text" id="username" placeholder="Username" required />
+      
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
       <button type="submit">Create Account</button>
     </form>
     <div class="link">
       <p>Already have an account? <a href="login.html">Login</a></p>
     </div>
   </div>
+
+  <script>
+    const regForm = document.getElementById('regForm');
+
+    regForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:8080/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            username: username, // Added username to the JSON body
+            email: email, 
+            password: password 
+          })
+        });
+
+        if (response.ok) {
+          alert("Registration successful! Please login.");
+          window.location.href = "login.html";
+        } else {
+          const data = await response.json();
+          alert("Error: " + (data.error || "Registration failed"));
+        }
+      } catch (err) {
+        alert("Server connection failed.");
+      }
+    });
+  </script>
 </body>
 </html>
