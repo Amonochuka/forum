@@ -2,9 +2,9 @@ package comment
 
 import "net/http"
 
-func RegisterRoutes(mux *http.ServeMux, h *Handler, requireAuth func(http.HandlerFunc) http.HandlerFunc) {
-	mux.HandleFunc("GET /posts/{id}/comments", h.GetComments)
-	mux.HandleFunc("POST /posts/{id}/comments", requireAuth(h.CreateComment))
-	mux.HandleFunc("GET /comments/{id}/replies", h.GetReplies)
-	mux.HandleFunc("POST /comments/{id}/replies", requireAuth(h.CreateReply))
+func RegisterRoutes(h *Handler, requireAuth func(http.Handler) http.Handler) {
+	http.Handle("GET /posts/{id}/comments", http.HandlerFunc(h.GetComments))
+	http.Handle("POST /posts/{id}/comments", requireAuth(http.HandlerFunc(h.CreateComment)))
+	http.Handle("GET /comments/{id}/replies", http.HandlerFunc(h.GetReplies))
+	http.Handle("POST /comments/{id}/replies", requireAuth(http.HandlerFunc(h.CreateReply)))
 }

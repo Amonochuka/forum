@@ -6,21 +6,53 @@ import (
 	"net/http"
 
 	"forum/internal/auth"
+	"forum/internal/comment"
+	"forum/internal/post"
+	"forum/internal/reaction"
+	"forum/internal/session"
+	"forum/internal/shared/middleware"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
-	log.Println("STARTING SERVER...")
-	db, err := sql.Open("sqlite3", "./forum.db")
+	db, err := sql.Open("sqlite3", "./data/app.db")
 	if err != nil {
 		log.Fatal(err)
 	}
-	repo := auth.NewRepository(db)
-	service := auth.NewService(repo)
-	handler := auth.NewHandler(service)
+
+	// auth
+	authRepo := auth.NewRepository(db)
+	authService := auth.NewService(authRepo)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
-	auth.RegisterRoutes(handler)
+
+	// session
+	sessionRepo := session.NewRepository(db)
+	sessionService := session.NewService(sessionRepo)
+	authHandler := auth.NewHandler(authService, sessionService)
+	auth.RegisterRoutes(authHandler)
+
+	requireAuth := middleware.RequireAuth(sessionService)
+
+	// comments
+	commentRepo := comment.NewRepository(db)
+	commentService := comment.NewService(commentRepo)
+	commentHandler := comment.NewHandler(commentService, sessionService)
+	comment.RegisterRoutes(commentHandler, requireAuth)
+	//post
+	postRepo := post.NewPostRepository(db)
+	catRepo := post.NewCategoryRepository(db)
+	userRepo := post.NewUserRepository(db)
+	reactionRepo := &reaction.ReactionRepository{DB: db}
+
+	postservice := post.NewPostService(postRepo, catRepo, userRepo, reactionRepo)
+	posthandler := post.NewPostHandler(postservice)
+	post.RegisterPostRoutes(posthandler, requireAuth)
+
+	// reaction
+	reactionService := &reaction.ReactionService{Repo: reactionRepo}
+	reactionHandler := reaction.NewHandler(reactionService)
+	reaction.RegisterRoutes(reactionHandler, requireAuth)
 
 	log.Println("🚀 Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

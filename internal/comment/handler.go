@@ -1,24 +1,57 @@
 package comment
 
 import (
+	"encoding/json"
 	"errors"
-	"forum/internal/auth"
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
+
+	"forum/internal/session"
+	"forum/internal/shared/middleware"
 )
 
-// TODO: Replace with actual session service
-type sessionService interface {
-	GetUserFromRequest(r *http.Request) (*auth.User, error)
-}
-
 type Handler struct {
-	service        Service
-	sessionService sessionService
+	service Service
 }
 
-func NewHandler(service Service, sessionService sessionService) *Handler {
-	return &Handler{service: service, sessionService: sessionService}
+func NewHandler(service Service, sessionService *session.Service) *Handler {
+	return &Handler{service: service}
+}
+
+func formatTime(t time.Time) string {
+	now := time.Now()
+	diff := now.Sub(t)
+
+	switch {
+	case diff < time.Minute:
+		return "just now"
+
+	case diff < time.Hour:
+		return fmt.Sprintf("%d minutes ago", int(diff.Minutes()))
+
+	case diff < 24*time.Hour:
+		return fmt.Sprintf("%d hours ago", int(diff.Hours()))
+
+	case diff < 48*time.Hour:
+		return "yesterday"
+
+	default:
+		return t.Format("02 Jan 2006")
+	}
+}
+
+func toCommentView(c Comment) CommentView {
+	return CommentView{
+		ID:         c.ID,
+		AuthorName: c.Name,
+		Body:       c.Content,
+		Likes:      c.Likes,
+		Dislikes:   c.Dislikes,
+		CreatedAt:  formatTime(c.CreatedAt),
+		ReplyCount: c.ReplyCount,
+	}
 }
 
 // GET /posts/{id}/comments
@@ -36,14 +69,28 @@ func (h *Handler) GetComments(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	comments, err := h.service.GetTopLevelComments(postID, page)
+	comments, count, err := h.service.GetTopLevelComments(postID, page)
 	if err != nil {
 		http.Error(w, "could not fetch comments", http.StatusInternalServerError)
 		return
 	}
 
-	// TODO: Render template with comments
-	_ = comments
+	views := make([]CommentView, 0, len(comments))
+
+	for _, c := range comments {
+		views = append(views, toCommentView(c))
+	}
+
+	resp := struct {
+		Comments []CommentView `json:"comments"`
+		Total    int           `json:"total"`
+	}{
+		Comments: views,
+		Total:    count,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
 }
 
 // POST /posts/{id}/comments
@@ -54,16 +101,16 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Swap this out when session service is available
-	user, err := h.sessionService.GetUserFromRequest(r)
-	if err != nil {
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	content := r.FormValue("content")
 
-	if err := h.service.CreateComment(user.ID, postID, content, nil); err != nil {
+	comment, err := h.service.CreateComment(userID, postID, content, nil)
+	if err != nil {
 		switch {
 		case errors.Is(err, ErrEmptyContent):
 			http.Error(w, "comment cannot be empty", http.StatusBadRequest)
@@ -75,7 +122,17 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/posts/"+strconv.Itoa(postID)+"/comments", http.StatusSeeOther)
+	view := toCommentView(*comment)
+
+	resp := struct{
+		CommentView CommentView `json:"comment"`
+	}{
+		CommentView: view,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(resp)
 }
 
 // GET /comments/{id}/replies
@@ -97,8 +154,20 @@ func (h *Handler) GetReplies(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Render template with replies
-	_ = replies
+	views := make([]CommentView, 0, len(replies))
+
+	for _, r := range replies {
+		views = append(views, toCommentView(r))
+	}
+
+	resp := struct {
+		Replies []CommentView `json:"replies"`
+	}{
+		Replies: views,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
 }
 
 // POST /comments/{id}/replies
@@ -109,9 +178,8 @@ func (h *Handler) CreateReply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Swap this out when session service is available
-	user, err := h.sessionService.GetUserFromRequest(r)
-	if err != nil {
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -123,7 +191,8 @@ func (h *Handler) CreateReply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.service.CreateComment(user.ID, postID, content, &parentID); err != nil {
+	comment, err := h.service.CreateComment(userID, postID, content, &parentID)
+	if err != nil {
 		switch {
 		case errors.Is(err, ErrEmptyContent):
 			http.Error(w, "reply cannot be empty", http.StatusBadRequest)
@@ -139,5 +208,15 @@ func (h *Handler) CreateReply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/posts/"+strconv.Itoa(postID)+"/comments", http.StatusSeeOther)
+	view := toCommentView(*comment)
+	
+	resp := struct{
+		CommentView CommentView `json:"comment"`
+	}{
+		CommentView: view,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(resp)
 }

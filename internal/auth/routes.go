@@ -1,40 +1,43 @@
 package auth
 
 import (
-	"log"
+	"html/template"
 	"net/http"
 )
 
 func RegisterRoutes(handler *Handler) {
-	log.Println("Routes registered")
-
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			http.ServeFile(w, r, "web/template/register.html")
-		case http.MethodPost:
-			handler.Register(w, r)
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		if r.Method == http.MethodGet {
+			http.ServeFile(w, r, "web/templates/register.html")
+			return
 		}
+		handler.Register(w, r)
 	})
-
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			http.ServeFile(w, r, "web/template/login.html")
-		case http.MethodPost:
-			handler.Login(w, r)
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		if r.Method == http.MethodGet {
+			http.ServeFile(w, r, "web/templates/login.html")
+			return
 		}
+		handler.Login(w, r)
 	})
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return
 		}
-		http.ServeFile(w, r, "web/template/home.html")
+		tmpl, err := template.ParseFiles(
+			"web/templates/index.html",
+			"web/templates/components/navbar.html",
+			"web/templates/components/hero.html",
+			"web/templates/components/create_post.html",
+			"web/templates/components/sidebar.html",
+			"web/templates/components/footer.html",
+			"web/templates/components/scripts.html",
+		)
+		if err != nil {
+			http.Error(w, "Failed to load templates: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		tmpl.Execute(w, nil)
 	})
 }

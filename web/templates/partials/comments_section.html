@@ -1,0 +1,31 @@
+{{ define "f_comments_section" }}
+<section id="f-comments" data-post-id="{{ .PostID }}">
+ 
+  <h3>Discourse ({{ .TotalCount }})</h3>
+ 
+  {{/* New comment form */}}
+  <div class="f-compose">
+    <img class="f-avatar" src="/static/images/default-avatar.png" alt="{{ .CurrentUser.Name }}">
+    <div class="f-compose-body">
+      <textarea id="f-new-comment" placeholder="Contribute to the discourse..." rows="3"></textarea>
+      <button onclick="fSubmitComment({{ .PostID }}, 'f-new-comment', 'f-comment-list')">
+        Post Comment
+      </button>
+    </div>
+  </div>
+ 
+  {{/* Comment list */}}
+  <div id="f-comment-list">
+    {{ range .Comments }}
+      {{ template "f_comment" . }}
+    {{ end }}
+  </div>
+ 
+  {{ if gt .TotalCount (len .Comments) }}
+  <button id="f-load-more" data-page="2" onclick="fLoadMore({{ .PostID }}, this)">
+    Load more
+  </button>
+  {{ end }}
+ 
+</section>
+{{ end }}

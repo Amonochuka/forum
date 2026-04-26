@@ -11,8 +11,8 @@ var (
 )
 
 type Service interface {
-	CreateComment(userID, postID int, content string, parentID *int) error
-	GetTopLevelComments(postID, page int) ([]Comment, error)
+	CreateComment(userID, postID int, content string, parentID *int) (*Comment, error)
+	GetTopLevelComments(postID, page int) ([]Comment, int, error)
 	GetReplies(parentID int) ([]Comment, error)
 }
 
@@ -24,13 +24,14 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) CreateComment(userID, postID int, content string, parentID *int) error {
+// TODO: Find a way to add the name of the commenter to the comment
+func (s *service) CreateComment(userID, postID int, content string, parentID *int) (*Comment, error) {
 	if content == "" {
-		return ErrEmptyContent
+		return nil, ErrEmptyContent
 	}
 
 	if len(content) > 1000 {
-		return ErrContentTooLong
+		return nil, ErrContentTooLong
 	}
 
 	// Prevent repling to a reply
@@ -38,13 +39,13 @@ func (s *service) CreateComment(userID, postID int, content string, parentID *in
 		parent, err := s.repo.GetByID(*parentID)
 		if err != nil {
 			if errors.Is(err, ErrNotFound) {
-				return ErrInvalidParentID
+				return nil, ErrInvalidParentID
 			}
-			return ErrInternalServerError
+			return nil, ErrInternalServerError
 		}
 
 		if parent.ParentID != nil {
-			return ErrNestedReplyNotAllowed
+			return nil, ErrNestedReplyNotAllowed
 		}
 	}
 
@@ -57,15 +58,15 @@ func (s *service) CreateComment(userID, postID int, content string, parentID *in
 
 	if err := s.repo.Create(comment); err != nil {
 		if errors.Is(err, ErrInvalidRef) {
-			return ErrInvalidParentID
+			return nil, ErrInvalidParentID
 		}
-		return ErrInternalServerError
+		return nil, ErrInternalServerError
 	}
 
-	return nil
+	return comment, nil
 }
 
-func (s *service) GetTopLevelComments(postID, page int) ([]Comment, error) {
+func (s *service) GetTopLevelComments(postID, page int) ([]Comment, int, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -75,10 +76,15 @@ func (s *service) GetTopLevelComments(postID, page int) ([]Comment, error) {
 
 	comments, err := s.repo.GetTopLevelByPostWithReactions(postID, limit, offset)
 	if err != nil {
-		return nil, ErrInternalServerError
+		return nil, 0, ErrInternalServerError
 	}
 
-	return comments, nil
+	count, err := s.repo.GetCountByPostID(postID)
+	if err != nil {
+		return nil, 0, ErrInternalServerError
+	}
+	
+	return comments, count, nil
 }
 
 func (s *service) GetReplies(parentID int) ([]Comment, error) {
@@ -92,4 +98,13 @@ func (s *service) GetReplies(parentID int) ([]Comment, error) {
 	}
 
 	return replies, nil
+}
+
+func (s *service) GetCommentCount(postID int) (int, error) {
+	count, err := s.repo.GetCountByPostID(postID)
+	if err != nil {
+		return 0, ErrInternalServerError
+	}
+
+	return count, nil
 }
