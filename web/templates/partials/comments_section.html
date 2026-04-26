@@ -1,3 +1,4 @@
+{{ define "f_comments_section" }}
 <section id="f-comments" data-post-id="{{ .PostID }}">
  
   <h3>Discourse ({{ .TotalCount }})</h3>
@@ -27,16 +28,4 @@
   {{ end }}
  
 </section>
-
-
-
-<section id="f-comments" data-post-id="{{ .PostID }}">
-    <h3>Discourse ({{ .TotalCount }})</h3>
-
-    <div class="f-compose">
-        <img class="f-avatar" src="/static/images/default-avatar.png" alt="{{ .CurrentUser.Name }}">
-        <div class="f-compose-body">
-            <textarea id="f-new-comment" placeholder="Contribute to the discourse..." rows="3"></textarea>
-            <button onclick="fSubmitComment({{ .PostID }}, 'f-new-comment', 'f-comment-list')"></button>
-    </div>
-</section>
+{{ end }}

@@ -3,6 +3,7 @@ package comment
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"strings"
 )
 
@@ -28,8 +29,6 @@ type sqliteRepo struct {
 func NewRepository(db *sql.DB) Repository {
 	return &sqliteRepo{db: db}
 }
-
-// TODO: Return custom repository errors as opposed to database errors
 
 func (r *sqliteRepo) GetByID(id int) (*Comment, error) {
 	query := `
@@ -59,6 +58,8 @@ func (r *sqliteRepo) GetByID(id int) (*Comment, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
+
+		log.Println("unexpected database error:", err)
 		return nil, ErrInternal
 	}
 
@@ -71,28 +72,24 @@ func (r *sqliteRepo) GetByID(id int) (*Comment, error) {
 }
 
 func (r *sqliteRepo) Create(comment *Comment) error {
-	query := `INSERT INTO comments (user_id, post_id, parent_id, content) VALUES (?, ?, ?, ?)`
-
-	result, err := r.db.Exec(
+	query := `INSERT INTO comments (user_id, post_id, parent_id, content) VALUES (?, ?, ?, ?) RETURNING id, created_at`
+	err := r.db.QueryRow(
 		query,
 		comment.UserID,
 		comment.PostID,
 		comment.ParentID, // can be nil. nil becomes NULL
 		comment.Content,
-	)
+	).Scan(&comment.ID, &comment.CreatedAt)
+
 	if err != nil {
 		if isConstraintError(err) {
+			log.Println("invalid reference:", err)
 			return ErrInvalidRef
 		}
+		log.Println("unexpected database error:", err)
 		return ErrInternal
-	}
+	}	
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		return ErrInternal
-	}
-
-	comment.ID = int(id)
 	return nil
 }
 
@@ -104,42 +101,37 @@ func (r *sqliteRepo) GetTopLevelByPostWithReactions(postID, limit, offset int) (
 	query := `
 		SELECT 
 			c.id, 
-			c.user_id, 
-			c.post_id, 
-			c.content, 
+			c.user_id,
+			c.post_id,
+			c.content,
 			c.created_at,
 			u.username,
-			likes,
-			dislikes,
-			reply_count,
 
-			COALESCE(SUM(CASE WHEN rx.reaction_type = 1 THEN 1 ELSE 0 END), 0) AS likes,
-			COALESCE(SUM(CASE WHEN rx.reaction_type = -1 THEN 1 ELSE 0 END), 0) AS dislikes
-
-			COUNT(DISTINCT replies.id) AS reply_count
+			(SELECT COUNT(*) FROM reactions WHERE comment_id = c.id AND reaction_type = 1) AS likes,
+			(SELECT COUNT(*) FROM reactions WHERE comment_id = c.id AND reaction_type = -1) AS dislikes,
+			(SELECT COUNT(*) FROM comments WHERE parent_id = c.id) AS reply_count
 
 		FROM comments c
 
-		LEFT JOIN reactions rx ON rx.comment_id = c.id
-		LEFT JOIN comments replies ON replies.parent_id = c.id
 		JOIN users u ON u.id = c.user_id
 
 		WHERE c.post_id = ? AND c.parent_id IS NULL
-
-		GROUP BY c.id
-
+		
 		ORDER BY c.created_at DESC
+
 		LIMIT ? OFFSET ?
 	`
 
 	rows, err := r.db.Query(query, postID, limit, offset)
 	if err != nil {
+		log.Println("unexpected database error:", err)
 		return nil, ErrInternal
 	}
 	defer rows.Close()
 
 	comments, err := scanCommentsWithReplyCount(rows)
 	if err != nil {
+		log.Println("unexpected database error:", err)
 		return nil, ErrInternal
 	}
 
@@ -155,27 +147,30 @@ func (r *sqliteRepo) GetRepliesByParentIDWithReactions(parentID int) ([]Comment,
 			c.content,
 			c.created_at,
 			u.username,
-			likes,
-			dislikes,
-
 			COALESCE(SUM(CASE WHEN rx.reaction_type = 1 THEN 1 ELSE 0 END), 0) AS likes,
 			COALESCE(SUM(CASE WHEN rx.reaction_type = -1 THEN 1 ELSE 0 END), 0) AS dislikes
+
 		FROM comments c
+
 		LEFT JOIN reactions rx ON rx.comment_id = c.id
 		JOIN users u ON u.id = c.user_id
 		WHERE c.parent_id = ?
+
 		GROUP BY c.id
+
 		ORDER BY c.created_at ASC
 	`
 
 	rows, err := r.db.Query(query, parentID)
 	if err != nil {
+		log.Println("unexpected database error:", err)
 		return nil, ErrInternal
 	}
 	defer rows.Close()
 
 	comments, err := scanComments(rows)
 	if err != nil {
+		log.Println("unexpected database error:", err)
 		return nil, ErrInternal
 	}
 
@@ -188,11 +183,12 @@ func (r *sqliteRepo) GetCountByPostID(postID int) (int, error) {
 	query := `
 		SELECT COUNT(*)
 		FROM comments
-		WHERE post_id = ?
+		WHERE post_id = ? AND parent_id IS NULL
 	`
 
 	err := r.db.QueryRow(query, postID).Scan(&count)
 	if err != nil {
+		log.Println("unexpected database error:", err)
 		return 0, ErrInternal
 	}
 

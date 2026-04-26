@@ -1,3 +1,53 @@
+// Escape user content before inserting into innerHTML
+function fEsc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Build a comment element
+function fRenderComment(c) {
+  const div = document.createElement('div');
+  div.className = 'f-comment';
+  div.id = 'f-comment-' + c.id;
+  div.dataset.id = c.id;
+ 
+  const replyCountLabel = c.replyCount === 1 ? '1 reply' : c.replyCount + ' replies';
+ 
+  div.innerHTML = `
+    <div class="f-comment-header">
+      <img class="f-avatar" src="${fEsc(c.avatarURL)}" alt="${fEsc(c.authorName)}">
+      <span class="f-author">${fEsc(c.authorName)}</span>
+      <span class="f-time">${fEsc(c.createdAt)}</span>
+    </div>
+    <p class="f-body">${fEsc(c.body)}</p>
+    <div class="f-actions">
+      <span class="f-likes" id="f-likes-${c.id}">${c.likes}</span>
+      <button onclick="fVote(${c.id}, 'up', this)">▲</button>
+      <button onclick="fVote(${c.id}, 'down', this)">▼</button>
+      <button onclick="fToggleReply(${c.id})">Reply</button>
+      ${c.replyCount > 0 ? `
+        <button id="f-view-replies-${c.id}" onclick="fLoadReplies(${c.id}, this)">
+          ${replyCountLabel}
+        </button>
+      ` : ''}
+    </div>
+    <div id="f-reply-form-${c.id}" style="display:none;" class="f-reply-form">
+      <textarea id="f-reply-text-${c.id}" placeholder="Write a reply..." rows="2"></textarea>
+      <div>
+        <button onclick="fSubmitReply(${c.id}, 'f-reply-text-${c.id}', 'f-replies-${c.id}')">Reply</button>
+        <button onclick="fToggleReply(${c.id})">Cancel</button>
+      </div>
+    </div>
+    <div id="f-replies-${c.id}" class="f-replies"></div>
+  `;
+ 
+  return div;
+}
+
 // Submit a top-level comment
 function fSubmitComment(postID, textareaID, listID) {
   const textarea = document.getElementById(textareaID);
@@ -49,7 +99,10 @@ function fLoadMore(postID, btn) {
   btn.textContent = 'Loading...';
  
   fetch('/posts/' + postID + '/comments?page=' + page)
-    .then(function(r) { return r.json(); })
+    .then(function(r) { 
+      if (!r.ok) throw new Error('failed');
+      return r.json(); 
+    })
     .then(function(data) {
       (data.comments || []).forEach(function(c) {
         list.appendChild(fRenderComment(c));
@@ -66,7 +119,120 @@ function fLoadMore(postID, btn) {
     })
     .catch(function() {
       btn.disabled = false;
-      btn.textContent = 'Load more';
+      btn.textContent = 'Failed to load — try again';
     });
 }
 
+// Show/hide the reply form under a comment
+function fToggleReply(commentID) {
+  const form = document.getElementById('f-reply-form-' + commentID);
+  if (!form) return;
+  const opening = form.style.display === 'none';
+  form.style.display = opening ? 'block' : 'none';
+  if (opening) {
+    document.getElementById('f-reply-text-' + commentID)?.focus();
+  }
+}
+
+// Load replies for a comment on first click, toggle on subsequent clicks
+function fLoadReplies(commentID, btn) {
+  const container = document.getElementById('f-replies-' + commentID);
+  if (!container) return;
+ 
+  if (container.dataset.loaded) {
+    const isHidden = container.style.display === 'none';
+    container.style.display = isHidden ? 'flex' : 'none';
+    btn.textContent = isHidden ? '▲ hide replies' : btn.dataset.label;
+    return;
+  }
+ 
+  btn.textContent = 'Loading...';
+  btn.disabled = true;
+ 
+  fetch('/comments/' + commentID + '/replies')
+    .then(function(r) { 
+      if (!r.ok) throw new Error('failed');
+      return r.json(); 
+    })
+    .then(function(data) {
+      const replies = data.replies || [];
+      replies.forEach(function(r) {
+        container.appendChild(fRenderReply(r));
+      });
+ 
+      const label = replies.length === 1 ? '1 reply' : replies.length + ' replies';
+      container.dataset.loaded = 'true';
+      btn.dataset.label = label;
+      container.style.display  = 'flex';
+ 
+      btn.textContent = '▲ hide replies';
+      btn.disabled = false;
+    })
+    .catch(function() {
+      btn.textContent = 'Could not load replies';
+      btn.disabled = false;
+    });
+}
+
+// submit a reply to a comment
+function fSubmitReply(parentID, textareaID, repliesContainerID) {
+  const textarea  = document.getElementById(textareaID);
+  const container = document.getElementById(repliesContainerID);
+  if (!textarea || !container) return;
+ 
+  const content = textarea.value.trim();
+  if (!content) return;
+ 
+  const postID = parseInt(
+    document.getElementById('f-comments')?.dataset.postId || '0', 10
+  );
+ 
+  const btn = textarea.closest('.f-reply-form').querySelector('button');
+  btn.disabled = true;
+  btn.textContent = 'Posting...';
+ 
+  const form = new FormData();
+  form.append('content', content);
+  form.append('post_id', postID);
+ 
+  fetch('/comments/' + parentID + '/replies', { method: 'POST', body: form })
+    .then(function(r) {
+      if (!r.ok) throw new Error('failed');
+      return r.json();
+    })
+    .then(function(data) {
+      container.style.display = 'flex';
+      container.dataset.loaded = 'true';
+      container.appendChild(fRenderReply(data.comment));
+ 
+      // update or create the view-replies button
+      const viewBtn = document.getElementById('f-view-replies-' + parentID);
+      if (viewBtn) {
+        const prev  = parseInt(viewBtn.dataset.label || '0', 10);
+        const count = prev + 1;
+        const label = count === 1 ? '1 reply' : count + ' replies';
+        viewBtn.dataset.label = label;
+        viewBtn.textContent   = '▲ hide replies';
+      } else {
+        const actions = document.querySelector('#f-comment-' + parentID + ' .f-actions');
+        if (actions) {
+          const newBtn = document.createElement('button');
+          newBtn.id = 'f-view-replies-' + parentID;
+          newBtn.dataset.label = '1 reply';
+          newBtn.textContent   = '▲ hide replies';
+          newBtn.onclick = function() { fLoadReplies(parentID, newBtn); };
+          actions.appendChild(newBtn);
+        }
+      }
+ 
+      textarea.value = '';
+      fToggleReply(parentID);
+    })
+    .catch(function() {
+      alert('Could not post reply. Please try again.');
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = 'Reply';
+    });
+}
