@@ -1,0 +1,139 @@
+{{define "scripts"}}
+<script>
+// --- Data Loading Functions ---
+
+/**
+ * Fetches all categories from the server and populates:
+ * 1. The sidebar filter list
+ * 2. The post creation form checkboxes
+ */
+async function loadCategories() {
+  try {
+    const res = await fetch("/categories");
+    const categories = await res.json();
+    const list = document.getElementById("categoryList");
+    const formCategories = document.getElementById("createPostCategories");
+
+    categories.forEach(cat => {
+      // 1. Add to Sidebar (Filters)
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <button onclick="loadPosts({category: '${cat.Name}'})">
+          # ${cat.Name}
+        </button>
+      `;
+      list.appendChild(li);
+
+      // 2. Add to Create Post Form (Checkboxes)
+      const label = document.createElement("label");
+      label.className = "checkbox-label";
+      label.innerHTML = `
+        <input type="checkbox" name="categories" value="${cat.Name}">
+        <span>${cat.Name}</span>
+      `;
+      formCategories.appendChild(label);
+    });
+  } catch (err) {
+    console.error("Failed to load categories:", err);
+  }
+}
+
+/**
+ * Fetches and displays posts. 
+ * filter: { category?: string, user?: string, liked?: boolean }
+ */
+async function loadPosts(filter = {}) {
+  const feed = document.getElementById("postFeed");
+  feed.innerHTML = '<div class="empty-state">Loading posts...</div>';
+
+  try {
+    let queryParams = new URLSearchParams();
+    if (filter.category) queryParams.append("category", filter.category);
+    if (filter.user) queryParams.append("user", filter.user);
+    if (filter.liked) queryParams.append("liked", "true");
+
+    const url = "/posts" + (queryParams.toString() ? "?" + queryParams.toString() : "");
+
+    const res = await fetch(url);
+    const posts = await res.json();
+
+    if (!posts || posts.length === 0) {
+      feed.innerHTML = '<div class="card empty-state">No posts found in this category.</div>';
+      return;
+    }
+
+    feed.innerHTML = "";
+    posts.forEach(post => {
+      const article = document.createElement("article");
+      article.className = "post-card";
+      
+      const categoriesHtml = post.Category ? post.Category.map(c => 
+        `<span class="post-tag">#${c.Name}</span>`
+      ).join(" ") : "";
+
+      article.innerHTML = `
+        <div class="post-tags">${categoriesHtml}</div>
+        <h3 class="post-title">${post.Title}</h3>
+        <p class="post-content">${post.Content}</p>
+        <div class="post-meta">
+          <span>By ${post.Username || 'Anonymous'} • ${new Date(post.CreatedAt).toLocaleDateString()}</span>
+          <div class="post-actions">
+            <span title="Likes">👍 ${post.Likes || 0}</span>
+            <span title="Dislikes">👎 ${post.Dislikes || 0}</span>
+            <span title="Comments">💬 0</span>
+          </div>
+        </div>
+      `;
+      feed.appendChild(article);
+    });
+  } catch (err) {
+    feed.innerHTML = '<div class="card empty-state" style="color: red;">Failed to load posts.</div>';
+    console.error(err);
+  }
+}
+
+// --- Event Handlers ---
+
+/**
+ * Handles the submission of the "Create Post" form.
+ */
+document.getElementById("postForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const title = document.getElementById("title").value;
+  const content = document.getElementById("content").value;
+  const categoryCheckboxes = document.querySelectorAll('input[name="categories"]:checked');
+  const categories = Array.from(categoryCheckboxes).map(cb => cb.parentElement.innerText.trim());
+
+  const postData = {
+    Title: title,
+    Content: content,
+    category: categories
+  };
+
+  try {
+    const res = await fetch("/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(postData)
+    });
+
+    if (!res.ok) throw new Error("Failed to create post");
+
+    alert("Post created successfully!");
+    document.getElementById("postForm").reset();
+    loadPosts(); // Refresh feed
+
+  } catch (err) {
+    console.error(err);
+    alert("Error creating post. Make sure you are logged in.");
+  }
+});
+
+// --- Initial Load ---
+window.onload = () => {
+  loadCategories();
+  loadPosts();
+};
+</script>
+{{end}}

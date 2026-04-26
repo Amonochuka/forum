@@ -134,6 +134,17 @@ func (r *ReactionRepository) GetPostReactions(postID int) ([]*Reaction, error) {
 	return reactions, nil
 }
 
+func (r *ReactionRepository) GetPostReactionCounts(postID int) (likes int, dislikes int, err error) {
+	err = r.DB.QueryRow(`
+		SELECT 
+			COUNT(CASE WHEN reaction_type = 1 THEN 1 END) as likes,
+			COUNT(CASE WHEN reaction_type = -1 THEN 1 END) as dislikes
+		FROM reactions
+		WHERE post_id = ?`, postID).Scan(&likes, &dislikes)
+	
+	return likes, dislikes, err
+}
+
 func (r *ReactionRepository) GetCommentReactions(commentID int) ([]*Reaction, error) {
 	rows, err := r.DB.Query(`
 	SELECT id, user_id, post_id, comment_id, reaction_type, created_at

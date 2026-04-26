@@ -1,6 +1,9 @@
 package auth
 
-import "net/http"
+import (
+	"html/template"
+	"net/http"
+)
 
 func RegisterRoutes(handler *Handler) {
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +21,23 @@ func RegisterRoutes(handler *Handler) {
 		handler.Login(w, r)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/templates/home.html")
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		tmpl, err := template.ParseFiles(
+			"web/templates/index.html",
+			"web/templates/components/navbar.html",
+			"web/templates/components/hero.html",
+			"web/templates/components/create_post.html",
+			"web/templates/components/sidebar.html",
+			"web/templates/components/footer.html",
+			"web/templates/components/scripts.html",
+		)
+		if err != nil {
+			http.Error(w, "Failed to load templates: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		tmpl.Execute(w, nil)
 	})
 }

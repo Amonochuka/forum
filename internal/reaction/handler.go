@@ -1,14 +1,18 @@
 package reaction
 
 import (
+	"forum/internal/shared/middleware"
 	"net/http"
 	"strconv"
-	"forum/internal/shared/middleware"
 )
 
 // Handler holds dependencies
 type Handler struct {
 	ReactionService *ReactionService
+}
+
+func NewHandler(service *ReactionService) *Handler {
+	return &Handler{ReactionService: service}
 }
 
 // React handles like/dislike actions
