@@ -35,11 +35,11 @@ func (s *Service) Register(user User) error {
 
 	_, err := s.Repo.GetUserByEmail(user.Email)
 	if err == nil {
-		// No error means the user was found so by default, email already taken.
-		return errors.New("email already exists")
+		// no error means user was found — email already taken
+		return ErrEmailExists
 	}
-	if !errors.Is(err, errors.New("user not found")) {
-		// Something went wrong with the DB , so don't proceed.
+	if !errors.Is(err, ErrUserNotFound) {
+		// real DB error — don't proceed
 		return err
 	}
 
@@ -54,12 +54,12 @@ func (s *Service) Register(user User) error {
 func (s *Service) Login(email, password string) (User, error) {
 	user, err := s.Repo.GetUserByEmail(email)
 	if err != nil {
-		// Return a generic message, don't reveal whether the email exists.
-		return User{}, errors.New("invalid email or password")
+		// generic message — don't reveal whether email exists
+		return User{}, ErrInvalidPassword
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return User{}, errors.New("invalid email or password")
+		return User{}, ErrInvalidPassword
 	}
 
 	return user, nil
