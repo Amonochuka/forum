@@ -43,7 +43,7 @@ func main() {
 	postRepo := post.NewPostRepository(db)
 	catRepo := post.NewCategoryRepository(db)
 	userRepo := post.NewUserRepository(db)
-	reactionRepo := &reaction.ReactionRepository{DB: db}
+	reactionRepo := reaction.NewRepository(db)
 
 	postservice := post.NewPostService(postRepo, catRepo, userRepo, reactionRepo)
 	posthandler := post.NewPostHandler(postservice)
