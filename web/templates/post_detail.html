@@ -1,0 +1,87 @@
+{{ define "content" }}
+<div class="main-layout">
+  {{ template "sidebar" . }}
+  <main id="postDetails">
+    <div id="post-details">
+      <p class="empty-state">Loading post...</p>
+    </div>
+    {{ template "f_comments_section" . }}
+  </main>
+</div>
+{{ end }}
+
+
+{{ define "post_detail" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/comments.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <span class="navbar-brand">Forum</span>
+      <ul class="navbar-nav">
+        <li><a href="/">Home</a></li>
+        <li><a href="/posts">Posts</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+
+    {{/* postID is available server-side for both the JS and the comments partial */}}
+    <div id="post-details" data-post-id="{{ .PostID }}">
+      <p class="empty-state">Loading post...</p>
+    </div>
+
+    {{/* Rendered server-side — doesn't depend on the JS fetch */}}
+    {{ template "f_comments_section" . }}
+
+  </div>
+
+  <footer class="footer">
+    <div class="container">Forum &copy; 2026</div>
+  </footer>
+
+  <script>
+    const postID = {{ .PostID }};
+
+    async function loadPostDetails() {
+      const container = document.getElementById("post-details");
+      try {
+        const res = await fetch(`/posts/${postID}`);
+        if (!res.ok) throw new Error("failed");
+        const post = await res.json();
+        container.innerHTML = `
+          <div class="post-card">
+            <div class="post-tags">
+              ${(post.Category || []).map(c => `<span class="post-tag">${c.Name}</span>`).join("")}
+            </div>
+            <h1 class="post-title" style="font-size: 1.75rem;">${post.Title}</h1>
+            <p class="post-content">${post.Content}</p>
+            <div class="post-meta">
+              <span>by <strong>${post.Username}</strong></span>
+              <div class="post-actions">
+                <span>▲ ${post.Likes}</span>
+                <span>▼ ${post.Dislikes}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<p class="empty-state">Failed to load post.</p>`;
+      }
+    }
+
+    window.onload = loadPostDetails;
+  </script>
+  <script src="/static/js/comments.js"></script>
+</body>
+</html>
+{{ end }}

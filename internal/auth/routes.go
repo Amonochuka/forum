@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"html/template"
+	// "html/template"
 	"net/http"
 )
 
@@ -25,19 +25,22 @@ func RegisterRoutes(handler *Handler) {
 			http.NotFound(w, r)
 			return
 		}
-		tmpl, err := template.ParseFiles(
-			"web/templates/index.html",
-			"web/templates/components/navbar.html",
-			"web/templates/components/hero.html",
-			"web/templates/components/create_post.html",
-			"web/templates/components/sidebar.html",
-			"web/templates/components/footer.html",
-			"web/templates/components/scripts.html",
-		)
-		if err != nil {
-			http.Error(w, "Failed to load templates: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		tmpl.Execute(w, nil)
+
+		handler.templates.ExecuteTemplate(w, "index.html", nil)
+
+		// tmpl, err := template.ParseFiles(
+		// 	"web/templates/index.html",
+		// 	"web/templates/components/navbar.html",
+		// 	"web/templates/components/hero.html",
+		// 	"web/templates/components/create_post.html",
+		// 	"web/templates/components/sidebar.html",
+		// 	"web/templates/components/footer.html",
+		// 	"web/templates/components/scripts.html",
+		// )
+		// if err != nil {
+		// 	http.Error(w, "Failed to load templates: "+err.Error(), http.StatusInternalServerError)
+		// 	return
+		// }
+		// tmpl.Execute(w, nil)
 	})
 }

@@ -33,6 +33,7 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+  background: linear-gradient(135deg, #444, #666);
 }
 
 /* ── Compose ── */

@@ -3,13 +3,17 @@ package post
 import (
 	"encoding/json"
 	"fmt"
+	"forum/internal/comment"
+	"forum/internal/shared/middleware"
+	"html/template"
 	"net/http"
 	"strconv"
-	"forum/internal/shared/middleware"
 )
 
 type PostHandler struct {
 	Service *PostService
+	commentService comment.Service
+	templates *template.Template
 }
 
 type CreatePostRequest struct {
@@ -18,8 +22,11 @@ type CreatePostRequest struct {
 	Category []string `json:"category"`
 }
 
-func NewPostHandler(service *PostService) *PostHandler {
-	return &PostHandler{Service: service}
+func NewPostHandler(service *PostService, commentService comment.Service, templates *template.Template) *PostHandler {
+	return &PostHandler{
+		Service: service,
+		commentService: commentService, 
+		templates: templates}
 }
 
 // Routes inside the Handler it get to decide which action to take based on the http method.
@@ -90,13 +97,35 @@ func (handler *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	post, err := handler.Service.GetPostByID(id)
+	if r.Header.Get("Accept") == "application/json" {
+        // return the post as JSON for the JS fetch 
+  
+		post, err := handler.Service.GetPostByID(id)
+		if err != nil {
+			http.Error(w, "Post Not Found", http.StatusNotFound)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(post)
+
+        return
+    }
+
+	 // otherwise render the HTML template with comments
+    comments, total, err := handler.commentService.GetTopLevelComments(id, 1)
 	if err != nil {
-		http.Error(w, "Post Not Found", http.StatusNotFound)
+		http.Error(w, "could not fetch comments", http.StatusInternalServerError)
 		return
 	}
 
-	json.NewEncoder(w).Encode(post)
+	commentsSectionData := comment.CommentsSectionData{
+		PostID: id,
+		Comments: comments,
+		TotalCount: total,
+	}
+
+    handler.templates.ExecuteTemplate(w, "post_detail", commentsSectionData)
 }
 
 func (handler *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {

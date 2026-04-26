@@ -131,9 +131,23 @@ document.getElementById("postForm").addEventListener("submit", async function(e)
 });
 
 // --- Initial Load ---
-window.onload = () => {
-  loadCategories();
-  loadPosts();
-};
+// window.onload = () => {
+//   loadCategories();
+//   loadPosts();
+// };
+
+document.addEventListener("DOMContentLoaded", () => {
+  const details = document.getElementById("postDetails");
+
+  if (details) {
+    loadPostDetails();
+  }
+
+  const feed = document.getElementById("postFeed");
+
+  if (feed) {
+    loadPosts();
+  }
+});
 </script>
 {{end}}

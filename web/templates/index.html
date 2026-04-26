@@ -17,15 +17,17 @@
 {{ template "create_post" . }}
 
 <!-- Feed Container -->
-<div class="main-layout">
+ {{ block "content" . }}{{ end }}
+<!-- <div class="main-layout"> -->
   
-{{ template "sidebar" . }}
+<!-- {{ template "sidebar" . }} -->
 
   <!-- Main Feed -->
-  <main id="postFeed">
+  <!-- <main id="postFeed">
     <div class="empty-state">Loading posts...</div>
-  </main>
-</div>
+  </main> -->
+
+<!-- </div> -->
 
 {{ template "footer" . }}
 

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"html/template"
 
 	"forum/internal/auth"
 	"forum/internal/comment"
@@ -22,6 +23,23 @@ func main() {
 		log.Fatal(err)
 	}
 
+	tmpl, err := template.ParseFiles(
+		"web/templates/index.html",
+		"web/templates/post_feed.html",
+		"web/templates/post_detail.html",
+		"web/templates/components/navbar.html",
+		"web/templates/components/hero.html",
+		"web/templates/components/create_post.html",
+		"web/templates/components/sidebar.html",
+		"web/templates/components/footer.html",
+		"web/templates/components/scripts.html",
+		"web/templates/components/comments_section.html",
+		"web/templates/components/comment.html",
+	)
+	if err != nil {
+		log.Fatal("failed to parse templates:", err)
+	}
+
 	// auth
 	authRepo := auth.NewRepository(db)
 	authService := auth.NewService(authRepo)
@@ -30,7 +48,7 @@ func main() {
 	// session
 	sessionRepo := session.NewRepository(db)
 	sessionService := session.NewService(sessionRepo)
-	authHandler := auth.NewHandler(authService, sessionService)
+	authHandler := auth.NewHandler(authService, sessionService, tmpl)
 	auth.RegisterRoutes(authHandler)
 
 	requireAuth := middleware.RequireAuth(sessionService)
@@ -51,7 +69,7 @@ func main() {
 	reactionRepo := &reaction.ReactionRepository{DB: db}
 
 	postservice := post.NewPostService(postRepo, catRepo, userRepo, reactionRepo)
-	posthandler := post.NewPostHandler(postservice)
+	posthandler := post.NewPostHandler(postservice, commentService, tmpl)
 	post.RegisterPostRoutes(posthandler, requireAuth)
 
 	// reaction

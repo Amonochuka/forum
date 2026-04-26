@@ -2,8 +2,6 @@ package comment
 
 import (
 	"time"
-
-	"forum/internal/auth"
 )
 
 type Comment struct {
@@ -21,7 +19,6 @@ type Comment struct {
 // View model - how the data is presented to the user
 type CommentsSectionData struct {
 	PostID      int
-	CurrentUser auth.User
 	Comments    []Comment
 	TotalCount  int
 }

@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"forum/internal/session"
+	"html/template"
 	"net/http"
 	"time"
 )
@@ -10,11 +11,13 @@ import (
 type Handler struct {
 	AuthService *Service
 	SessionService *session.Service
+	templates *template.Template
 }
 
-func NewHandler(authservice *Service,sessionService *session.Service) *Handler {
+func NewHandler(authservice *Service,sessionService *session.Service, templates *template.Template) *Handler {
 	return &Handler{AuthService: authservice,
 		SessionService: sessionService,
+		templates: templates,
 	}
 }
 
