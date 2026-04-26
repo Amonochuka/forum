@@ -11,15 +11,27 @@ func RegisterRoutes(handler *Handler) {
 			http.ServeFile(w, r, "web/templates/register.html")
 			return
 		}
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 		handler.Register(w, r)
 	})
+
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
 			http.ServeFile(w, r, "web/templates/login.html")
 			return
 		}
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 		handler.Login(w, r)
 	})
+
+	http.HandleFunc("/logout", handler.Logout)
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
