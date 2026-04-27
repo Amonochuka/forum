@@ -8,6 +8,29 @@ function fEsc(str) {
     .replace(/"/g, '&quot;');
 }
 
+function fClearAuthPrompt(scope) {
+  if (!scope) return;
+  const existing = scope.querySelector('.f-auth-prompt');
+  if (existing) existing.remove();
+}
+
+function fShowAuthPrompt(scope, message) {
+  if (!scope) return;
+  fClearAuthPrompt(scope);
+
+  const prompt = document.createElement('div');
+  prompt.className = 'f-auth-prompt';
+  prompt.innerHTML = `
+    <p>${fEsc(message)}</p>
+    <div class="f-auth-actions">
+      <a href="/login">Log in</a>
+      <a href="/register">Register</a>
+    </div>
+  `;
+
+  scope.appendChild(prompt);
+}
+
 // Build a comment element
 function fRenderComment(c) {
   const div = document.createElement('div');
@@ -19,15 +42,26 @@ function fRenderComment(c) {
  
   div.innerHTML = `
     <div class="f-comment-header">
-      <img class="f-avatar" src="${fEsc(c.avatarURL)}" alt="${fEsc(c.authorName)}">
       <span class="f-author">${fEsc(c.authorName)}</span>
       <span class="f-time">${fEsc(c.createdAt)}</span>
     </div>
     <p class="f-body">${fEsc(c.body)}</p>
     <div class="f-actions">
-      <span class="f-likes" id="f-likes-${c.id}">${c.likes}</span>
-      <button onclick="fVote(${c.id}, 'up', this)">▲</button>
-      <button onclick="fVote(${c.id}, 'down', this)">▼</button>
+      <span class="f-likes" id="f-likes-${c.id}">👍 ${c.likes}</span>
+      <span class="f-dislikes" id="f-dislikes-${c.id}">👎 ${c.dislikes}</span>
+
+      <form action="/react" method="POST" style="display:inline;">
+        <input type="hidden" name="comment_id" value="${c.id}">
+        <input type="hidden" name="type" value="like">
+        <button type="submit">▲</button>
+      </form>
+
+      <form action="/react" method="POST" style="display:inline;">
+        <input type="hidden" name="comment_id" value="${c.id}">
+        <input type="hidden" name="type" value="dislike">
+        <button type="submit">▼</button>
+      </form>
+
       <button onclick="fToggleReply(${c.id})">Reply</button>
       ${c.replyCount > 0 ? `
         <button id="f-view-replies-${c.id}" onclick="fLoadReplies(${c.id}, this)">
@@ -48,6 +82,39 @@ function fRenderComment(c) {
   return div;
 }
 
+function fRenderReply(r) {
+  const div = document.createElement('div');
+  div.className = 'f-comment';
+  div.id = 'f-comment-' + r.id;
+ 
+  div.innerHTML = `
+    <div class="f-comment-header">
+      <span class="f-author">${fEsc(r.authorName)}</span>
+      ${r.badge ? `<span class="f-badge">${fEsc(r.badge)}</span>` : ''}
+      <span class="f-time">${fEsc(r.createdAt)}</span>
+    </div>
+    <p class="f-body">${fEsc(r.body)}</p>
+    <div class="f-actions">
+     <span class="f-likes" id="f-likes-${r.id}">👍 ${r.likes}</span>
+    <span class="f-dislikes" id="f-dislikes-${r.id}">👎 ${r.dislikes}</span>
+
+    <form action="/react" method="POST" style="display:inline;">
+      <input type="hidden" name="comment_id" value="${r.id}">
+      <input type="hidden" name="type" value="like">
+      <button type="submit">▲</button>
+    </form>
+
+    <form action="/react" method="POST" style="display:inline;">
+      <input type="hidden" name="comment_id" value="${r.id}">
+      <input type="hidden" name="type" value="dislike">
+      <button type="submit">▼</button>
+    </form>
+    </div>
+  `;
+ 
+  return div;
+}
+
 // Submit a top-level comment
 function fSubmitComment(postID, textareaID, listID) {
   const textarea = document.getElementById(textareaID);
@@ -56,8 +123,10 @@ function fSubmitComment(postID, textareaID, listID) {
  
   const content = textarea.value.trim();
   if (!content) return;
- 
+
   const btn = textarea.closest('.f-compose-body').querySelector('button');
+  const composeBody = textarea.closest('.f-compose-body');
+  fClearAuthPrompt(composeBody);
   btn.disabled = true;
   btn.textContent = 'Posting...';
  
@@ -66,6 +135,9 @@ function fSubmitComment(postID, textareaID, listID) {
  
   fetch('/posts/' + postID + '/comments', { method: 'POST', body: form })
     .then(function(r) {
+      if (r.status === 401) {
+        throw new Error('auth');
+      }
       if (!r.ok) throw new Error('failed');
       return r.json();
     })
@@ -81,7 +153,11 @@ function fSubmitComment(postID, textareaID, listID) {
         });
       }
     })
-    .catch(function() {
+    .catch(function(err) {
+      if (err.message === 'auth') {
+        fShowAuthPrompt(composeBody, 'You need to log in to post a comment.');
+        return;
+      }
       alert('Could not post comment. Please try again.');
     })
     .finally(function() {
@@ -186,8 +262,10 @@ function fSubmitReply(parentID, textareaID, repliesContainerID) {
   const postID = parseInt(
     document.getElementById('f-comments')?.dataset.postId || '0', 10
   );
- 
-  const btn = textarea.closest('.f-reply-form').querySelector('button');
+
+  const replyForm = textarea.closest('.f-reply-form');
+  const btn = replyForm.querySelector('button');
+  fClearAuthPrompt(replyForm);
   btn.disabled = true;
   btn.textContent = 'Posting...';
  
@@ -197,6 +275,9 @@ function fSubmitReply(parentID, textareaID, repliesContainerID) {
  
   fetch('/comments/' + parentID + '/replies', { method: 'POST', body: form })
     .then(function(r) {
+      if (r.status === 401) {
+        throw new Error('auth');
+      }
       if (!r.ok) throw new Error('failed');
       return r.json();
     })
@@ -228,7 +309,11 @@ function fSubmitReply(parentID, textareaID, repliesContainerID) {
       textarea.value = '';
       fToggleReply(parentID);
     })
-    .catch(function() {
+    .catch(function(err) {
+      if (err.message === 'auth') {
+        fShowAuthPrompt(replyForm, 'You need to log in to post a reply.');
+        return;
+      }
       alert('Could not post reply. Please try again.');
     })
     .finally(function() {

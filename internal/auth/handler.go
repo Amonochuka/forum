@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"html/template"
 	"net/http"
 	"time"
 
@@ -29,12 +30,13 @@ func toUserResponse(u User) UserResponse {
 type Handler struct {
 	AuthService    *Service
 	SessionService *session.Service
+	templates *template.Template
 }
 
-func NewHandler(authService *Service, sessionService *session.Service) *Handler {
-	return &Handler{
-		AuthService:    authService,
+func NewHandler(authservice *Service,sessionService *session.Service, templates *template.Template) *Handler {
+	return &Handler{AuthService: authservice,
 		SessionService: sessionService,
+		templates: templates,
 	}
 }
 

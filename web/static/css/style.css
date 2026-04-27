@@ -218,10 +218,18 @@ input:focus, textarea:focus {
   border-radius: var(--radius);
   border: 1px solid var(--border-color);
   margin-bottom: 1.5rem;
-  transition: box-shadow 0.2s;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
 }
-.post-card:hover {
+.post-card:hover,
+.post-card:focus-visible {
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--primary-light);
+}
+.post-card:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 2px;
 }
 .post-tags {
   display: flex;
@@ -255,6 +263,18 @@ input:focus, textarea:focus {
 .post-actions {
   display: flex;
   gap: 1rem;
+}
+.post-comments-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  transition: background-color 0.2s, color 0.2s, transform 0.2s;
+}
+.post-comments-link:hover {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  transform: scale(1.05);
 }
 
 /* Loading/Empty State */

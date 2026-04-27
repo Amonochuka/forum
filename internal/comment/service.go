@@ -24,7 +24,6 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-// TODO: Find a way to add the name of the commenter to the comment
 func (s *service) CreateComment(userID, postID int, content string, parentID *int) (*Comment, error) {
 	if content == "" {
 		return nil, ErrEmptyContent

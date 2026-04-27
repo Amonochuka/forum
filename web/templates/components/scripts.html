@@ -16,22 +16,26 @@ async function loadCategories() {
 
     categories.forEach(cat => {
       // 1. Add to Sidebar (Filters)
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <button onclick="loadPosts({category: '${cat.Name}'})">
-          # ${cat.Name}
-        </button>
-      `;
-      list.appendChild(li);
+      if (list) {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <button onclick="loadPosts({category: '${cat.Name}'})">
+            # ${cat.Name}
+          </button>
+        `;
+        list.appendChild(li);
+      }
 
       // 2. Add to Create Post Form (Checkboxes)
-      const label = document.createElement("label");
-      label.className = "checkbox-label";
-      label.innerHTML = `
-        <input type="checkbox" name="categories" value="${cat.Name}">
-        <span>${cat.Name}</span>
-      `;
-      formCategories.appendChild(label);
+      if (formCategories) {
+        const label = document.createElement("label");
+        label.className = "checkbox-label";
+        label.innerHTML = `
+          <input type="checkbox" name="categories" value="${cat.Name}">
+          <span>${cat.Name}</span>
+        `;
+        formCategories.appendChild(label);
+      }
     });
   } catch (err) {
     console.error("Failed to load categories:", err);
@@ -66,6 +70,8 @@ async function loadPosts(filter = {}) {
     posts.forEach(post => {
       const article = document.createElement("article");
       article.className = "post-card";
+      article.tabIndex = 0;
+      article.style.cursor = "pointer";
       
       const categoriesHtml = post.Category ? post.Category.map(c => 
         `<span class="post-tag">#${c.Name}</span>`
@@ -80,10 +86,55 @@ async function loadPosts(filter = {}) {
           <div class="post-actions">
             <span title="Likes">👍 ${post.Likes || 0}</span>
             <span title="Dislikes">👎 ${post.Dislikes || 0}</span>
-            <span title="Comments">💬 0</span>
+            <span class="post-comments-link" title="Comments">💬 0</span>
           </div>
         </div>
       `;
+
+      article.addEventListener("click", () => {
+        window.location.href = `/posts/${post.ID}`;
+      });
+
+      article.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          window.location.href = `/posts/${post.ID}`;
+        }
+      });
+
+      const commentsLink = article.querySelector(".post-comments-link");
+      if (commentsLink) {
+        commentsLink.style.cursor = "pointer";
+        commentsLink.addEventListener("click", (event) => {
+          event.stopPropagation();
+          window.location.href = `/posts/${post.ID}#f-comments`;
+        });
+
+        commentsLink.addEventListener("mouseenter", () => {
+          commentsLink.style.backgroundColor = "var(--primary-light)";
+          commentsLink.style.color = "var(--primary)";
+          commentsLink.style.transform = "scale(1.05)";
+        });
+
+        commentsLink.addEventListener("mouseleave", () => {
+          commentsLink.style.backgroundColor = "";
+          commentsLink.style.color = "";
+          commentsLink.style.transform = "";
+        });
+      }
+
+      article.addEventListener("mouseenter", () => {
+        article.style.boxShadow = "var(--shadow-md)";
+        article.style.transform = "translateY(-2px)";
+        article.style.borderColor = "var(--primary-light)";
+      });
+
+      article.addEventListener("mouseleave", () => {
+        article.style.boxShadow = "";
+        article.style.transform = "";
+        article.style.borderColor = "";
+      });
+
       feed.appendChild(article);
     });
   } catch (err) {
@@ -97,43 +148,47 @@ async function loadPosts(filter = {}) {
 /**
  * Handles the submission of the "Create Post" form.
  */
-document.getElementById("postForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
+const postForm = document.getElementById("postForm");
 
-  const title = document.getElementById("title").value;
-  const content = document.getElementById("content").value;
-  const categoryCheckboxes = document.querySelectorAll('input[name="categories"]:checked');
-  const categories = Array.from(categoryCheckboxes).map(cb => cb.parentElement.innerText.trim());
+if (postForm) {
+  postForm.addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-  const postData = {
-    Title: title,
-    Content: content,
-    category: categories
-  };
+    const title = document.getElementById("title").value;
+    const content = document.getElementById("content").value;
+    const categoryCheckboxes = document.querySelectorAll('input[name="categories"]:checked');
+    const categories = Array.from(categoryCheckboxes).map(cb => cb.parentElement.innerText.trim());
 
-  try {
-    const res = await fetch("/posts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(postData)
-    });
+    const postData = {
+      Title: title,
+      Content: content,
+      category: categories
+    };
 
-    if (!res.ok) throw new Error("Failed to create post");
+    try {
+      const res = await fetch("/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(postData)
+      });
 
-    alert("Post created successfully!");
-    document.getElementById("postForm").reset();
-    loadPosts(); // Refresh feed
+      if (!res.ok) throw new Error("Failed to create post");
 
-  } catch (err) {
-    console.error(err);
-    alert("Error creating post. Make sure you are logged in.");
-  }
-});
+      alert("Post created successfully!");
+      postForm.reset();
+      loadPosts();
+    } catch (err) {
+      console.error(err);
+      alert("Error creating post. Make sure you are logged in.");
+    }
+  });
+}
 
 // --- Initial Load ---
 window.onload = () => {
   loadCategories();
   loadPosts();
 };
+
 </script>
 {{end}}

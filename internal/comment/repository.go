@@ -38,7 +38,7 @@ func (r *sqliteRepo) GetByID(id int) (*Comment, error) {
 			post_id, 
 			parent_id,
 			content, 
-			created_at,
+			created_at
 		FROM comments
 		WHERE id = ?
 	`
@@ -49,8 +49,8 @@ func (r *sqliteRepo) GetByID(id int) (*Comment, error) {
 	err := r.db.QueryRow(query, id).Scan(
 		&c.ID,
 		&c.UserID,
-		&parentID,
 		&c.PostID,
+		&parentID,
 		&c.Content,
 		&c.CreatedAt,
 	)

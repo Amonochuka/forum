@@ -3,55 +3,20 @@ package comment
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
-	"forum/internal/session"
 	"forum/internal/shared/middleware"
+	"forum/internal/user"
 )
 
 type Handler struct {
-	service Service
+	service     Service
+	userService user.Service
 }
 
-func NewHandler(service Service, sessionService *session.Service) *Handler {
-	return &Handler{service: service}
-}
-
-func formatTime(t time.Time) string {
-	now := time.Now()
-	diff := now.Sub(t)
-
-	switch {
-	case diff < time.Minute:
-		return "just now"
-
-	case diff < time.Hour:
-		return fmt.Sprintf("%d minutes ago", int(diff.Minutes()))
-
-	case diff < 24*time.Hour:
-		return fmt.Sprintf("%d hours ago", int(diff.Hours()))
-
-	case diff < 48*time.Hour:
-		return "yesterday"
-
-	default:
-		return t.Format("02 Jan 2006")
-	}
-}
-
-func toCommentView(c Comment) CommentView {
-	return CommentView{
-		ID:         c.ID,
-		AuthorName: c.Name,
-		Body:       c.Content,
-		Likes:      c.Likes,
-		Dislikes:   c.Dislikes,
-		CreatedAt:  formatTime(c.CreatedAt),
-		ReplyCount: c.ReplyCount,
-	}
+func NewHandler(service Service, userService user.Service) *Handler {
+	return &Handler{service: service, userService: userService}
 }
 
 // GET /posts/{id}/comments
@@ -75,11 +40,7 @@ func (h *Handler) GetComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	views := make([]CommentView, 0, len(comments))
-
-	for _, c := range comments {
-		views = append(views, toCommentView(c))
-	}
+	views := ToCommentViews(comments)
 
 	resp := struct {
 		Comments []CommentView `json:"comments"`
@@ -122,9 +83,24 @@ func (h *Handler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	view := toCommentView(*comment)
+	// Get user
+	user, err := h.userService.GetByID(userID)
+	if err != nil {
+		switch {
+		case errors.Is(err, ErrNotFound):
+			http.Error(w, "user not found", http.StatusNotFound)
+		default:
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+		}
+		return
+	}
 
-	resp := struct{
+	// Add their name
+	comment.Name = user.Username
+
+	view := ToCommentView(*comment)
+
+	resp := struct {
 		CommentView CommentView `json:"comment"`
 	}{
 		CommentView: view,
@@ -154,11 +130,7 @@ func (h *Handler) GetReplies(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	views := make([]CommentView, 0, len(replies))
-
-	for _, r := range replies {
-		views = append(views, toCommentView(r))
-	}
+	views := ToCommentViews(replies)
 
 	resp := struct {
 		Replies []CommentView `json:"replies"`
@@ -208,9 +180,9 @@ func (h *Handler) CreateReply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	view := toCommentView(*comment)
-	
-	resp := struct{
+	view := ToCommentView(*comment)
+
+	resp := struct {
 		CommentView CommentView `json:"comment"`
 	}{
 		CommentView: view,

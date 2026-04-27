@@ -1,0 +1,55 @@
+{{ define "post_detail" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/comments.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <span class="navbar-brand">Forum</span>
+      <ul class="navbar-nav">
+        <li><a href="/">Home</a></li>
+        <li><a href="/">Posts</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+
+    <div id="post-details" data-post-id="{{ .PostID }}">
+      <div class="post-card">
+        <div class="post-tags">
+          {{ range .Post.Category }}
+            <span class="post-tag">{{ .Name }}</span>
+          {{ end }}
+        </div>
+        <h1 class="post-title" style="font-size: 1.75rem;">{{ .Post.Title }}</h1>
+        <p class="post-content">{{ .Post.Content }}</p>
+        <div class="post-meta">
+          <span>by <strong>{{ .Post.Username }}</strong></span>
+          <div class="post-actions">
+            <span>▲ {{ .Post.Likes }}</span>
+            <span>▼ {{ .Post.Dislikes }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{ template "f_comments_section" . }}
+
+  </div>
+
+  <footer class="footer">
+    <div class="container">Forum &copy; 2026</div>
+  </footer>
+
+  <script src="/static/js/comments.js"></script>
+</body>
+</html>
+{{ end }}

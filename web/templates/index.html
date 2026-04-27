@@ -17,15 +17,7 @@
 {{ template "create_post" . }}
 
 <!-- Feed Container -->
-<div class="main-layout">
-  
-{{ template "sidebar" . }}
-
-  <!-- Main Feed -->
-  <main id="postFeed">
-    <div class="empty-state">Loading posts...</div>
-  </main>
-</div>
+{{ template "post_feed_content" . }}
 
 {{ template "footer" . }}
 
