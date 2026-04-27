@@ -180,6 +180,21 @@ func (h *Handler) CreateReply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get user
+	user, err := h.userService.GetByID(userID)
+	if err != nil {
+		switch {
+		case errors.Is(err, ErrNotFound):
+			http.Error(w, "user not found", http.StatusNotFound)
+		default:
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Add their name
+	comment.Name = user.Username
+	
 	view := ToCommentView(*comment)
 
 	resp := struct {

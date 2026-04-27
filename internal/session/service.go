@@ -8,13 +8,20 @@ import (
 	"github.com/google/uuid"
 )
 
+type sessionRepo interface {
+	CreateSessionRepository(uuid string, userID int, createdAt time.Time, expiresAt time.Time) error
+	Get(uuid string) (int, time.Time, error)
+	Delete(uuid string) error
+	DeleteAllUserSessions(userID int) error
+}
+
 // helper to talsk to the repository
 type Service struct {
-	repo *Repository
+	repo sessionRepo
 }
 
 // The Constructor: This connects the Brain to the Librarian
-func NewService(repo *Repository) *Service {
+func NewService(repo sessionRepo) *Service {
 	return &Service{
 		repo: repo,
 	}
