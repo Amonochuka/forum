@@ -1,0 +1,113 @@
+.
+├── architecture.md
+├── check_db.go
+├── cmd
+│   ├── app
+│   │   └── main.go
+│   └── testdb
+│       └── main.go
+├── data
+│   └── app.db
+├── dockerfile
+├── forum.db
+├── forum_design
+│   └── docker_web_forum
+│       ├── civic_discourse
+│       │   └── DESIGN.md
+│       ├── create_post
+│       │   └── screen.png
+│       ├── home_feed
+│       │   └── screen.png
+│       ├── login_register
+│       │   └── screen.png
+│       ├── post_details
+│       │   └── screen.png
+│       └── user_profile
+│           └── screen.png
+├── forum_design.zip
+├── go.mod
+├── go.sum
+├── internal
+│   ├── auth
+│   │   ├── handler.go
+│   │   ├── model.go
+│   │   ├── repository.go
+│   │   ├── routes.go
+│   │   ├── service.go
+│   │   └── service_test.go
+│   ├── comment
+│   │   ├── handler.go
+│   │   ├── model.go
+│   │   ├── repository.go
+│   │   ├── routes.go
+│   │   ├── service.go
+│   │   ├── service_test.go
+│   │   └── view.go
+│   ├── db
+│   │   └── seed.sql
+│   ├── post
+│   │   ├── handler.go
+│   │   ├── handler_test.go
+│   │   ├── model.go
+│   │   ├── repository.go
+│   │   ├── repository_test.go
+│   │   ├── routes.go
+│   │   ├── service.go
+│   │   └── service_test.go
+│   ├── reaction
+│   │   ├── handler.go
+│   │   ├── model.go
+│   │   ├── repository.go
+│   │   ├── routes.go
+│   │   └── service.go
+│   ├── session
+│   │   ├── model.go
+│   │   ├── repository.go
+│   │   ├── service.go
+│   │   └── service_test.go
+│   ├── shared
+│   │   ├── helpers
+│   │   │   └── helpers.go
+│   │   └── middleware
+│   │       ├── auth.go
+│   │       ├── context.go
+│   │       └── sendError.go
+│   └── user
+│       ├── handler.go
+│       ├── model.go
+│       ├── repository.go
+│       └── service.go
+├── migrations
+│   └── tables.sql
+├── scratch_seed.go
+├── tree.txt
+└── web
+    ├── static
+    │   ├── css
+    │   │   ├── comments.css
+    │   │   └── style.css
+    │   ├── js
+    │   │   └── comments.js
+    │   └── style.css
+    ├── template
+    │   ├── base.html
+    │   ├── home.html
+    │   ├── login.html
+    │   └── register.html
+    └── templates
+        ├── components
+        │   ├── comment.html
+        │   ├── comments_section.html
+        │   ├── create_post.html
+        │   ├── footer.html
+        │   ├── hero.html
+        │   ├── navbar.html
+        │   ├── scripts.html
+        │   └── sidebar.html
+        ├── index.html
+        ├── login.html
+        ├── post_detail.html
+        ├── post_feed.html
+        └── register.html
+
+32 directories, 79 files

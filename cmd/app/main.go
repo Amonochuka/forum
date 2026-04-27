@@ -1,13 +1,15 @@
 package main
 
 import (
-	"database/sql"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
+	// db "forum/cmd/testdb"
 	"forum/internal/auth"
 	"forum/internal/comment"
+	"forum/internal/db"
 	"forum/internal/post"
 	"forum/internal/reaction"
 	"forum/internal/session"
@@ -18,7 +20,16 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("sqlite3", "./data/app.db")
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "./data/app.db"
+	}
+
+	db, err := db.Init(
+		dbPath,
+		"./migrations/tables.sql",
+		"./internal/db/seed.sql",
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,7 +74,7 @@ func main() {
 	commentService := comment.NewService(commentRepo)
 	commentHandler := comment.NewHandler(commentService, userService)
 	comment.RegisterRoutes(commentHandler, requireAuth)
-	//post
+	// post
 	postRepo := post.NewPostRepository(db)
 	catRepo := post.NewCategoryRepository(db)
 	userRepo := post.NewUserRepository(db)
