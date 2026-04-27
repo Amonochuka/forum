@@ -33,6 +33,7 @@ func main() {
 	auth.RegisterRoutes(authHandler)
 
 	requireAuth := middleware.RequireAuth(sessionService)
+	optionalAuth := middleware.OptionalAuth(sessionService)
 
 	// comments
 	commentRepo := comment.NewRepository(db)
@@ -47,7 +48,7 @@ func main() {
 
 	postservice := post.NewPostService(postRepo, catRepo, userRepo, reactionRepo)
 	posthandler := post.NewPostHandler(postservice)
-	post.RegisterPostRoutes(posthandler, requireAuth)
+	post.RegisterPostRoutes(posthandler, requireAuth, optionalAuth)
 
 	// reaction
 	reactionService := &reaction.ReactionService{Repo: reactionRepo}
