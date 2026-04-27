@@ -52,13 +52,13 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		helpers.SendError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := h.AuthService.Register(user); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("User registered successfully"))
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "User registered successfully",
+	})
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {

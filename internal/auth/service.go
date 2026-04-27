@@ -30,9 +30,9 @@ func validateUser(user User) error {
 	if strings.TrimSpace(user.Email) == "" {
 		return ErrEmailMissing
 	}
-	// if len(user.Password) < 8 {
-	// 	return ErrPasswordShort
-	// }
+	if len(user.Password) < 8 {
+		return ErrPasswordShort
+	}
 	return nil
 }
 
