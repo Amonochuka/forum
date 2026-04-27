@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("sqlite3", "./data/app.db")
+	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,6 +33,7 @@ func main() {
 	auth.RegisterRoutes(authHandler)
 
 	requireAuth := middleware.RequireAuth(sessionService)
+	optionalAuth := middleware.OptionalAuth(sessionService)
 
 	// comments
 	commentRepo := comment.NewRepository(db)
@@ -47,13 +48,13 @@ func main() {
 
 	postservice := post.NewPostService(postRepo, catRepo, userRepo, reactionRepo)
 	posthandler := post.NewPostHandler(postservice)
-	post.RegisterPostRoutes(posthandler, requireAuth)
+	post.RegisterPostRoutes(posthandler, requireAuth, optionalAuth)
 
 	// reaction
 	reactionService := &reaction.ReactionService{Repo: reactionRepo}
 	reactionHandler := reaction.NewHandler(reactionService)
 	reaction.RegisterRoutes(reactionHandler, requireAuth)
 
-	log.Println("🚀 Server running on http://localhost:8080")
+	log.Println("Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

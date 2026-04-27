@@ -9,7 +9,7 @@ import (
 )
 
 type Service struct {
-	Repo *Repository
+	Repo UserRepo
 }
 
 var (
@@ -19,7 +19,7 @@ var (
 	ErrPasswordShort   = errors.New("password must be at least 8 characters")
 )
 
-func NewService(repo *Repository) *Service {
+func NewService(repo UserRepo) *Service {
 	return &Service{Repo: repo}
 }
 
