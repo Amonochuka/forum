@@ -4,7 +4,11 @@ import (
 	"database/sql"
 	"errors"
 )
-
+type UserRepo interface {
+    GetUserByEmail(email string) (User, error)
+    CreateUser(user User) error
+    GetUserByID(id int) (User, error)
+}
 var (
 	ErrUserNotFound    = errors.New("user not found")
 	ErrEmailExists     = errors.New("email already exists")

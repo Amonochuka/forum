@@ -26,3 +26,27 @@ func RequireAuth(sessionsService *session.Service) func(http.Handler) http.Handl
 		})
 	}
 }
+
+func OptionalAuth(sessionsService *session.Service) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			cookie, err := r.Cookie("session_id")
+			if err != nil {
+				// No cookie, proceed without user
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			userID, err := sessionsService.ValidateSession(cookie.Value)
+			if err != nil {
+				// Invalid cookie, proceed without user
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			// Valid session, inject user ID
+			ctx := context.WithValue(r.Context(), userKey, userID)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}

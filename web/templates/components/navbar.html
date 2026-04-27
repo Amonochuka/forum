@@ -7,7 +7,7 @@
       <a href="/" class="active">Home</a>
 
       {{if .User}}
-        <span class="welcome-text">Logged in as: <strong>{{.User.Username}}</strong></span>
+        <span class="welcome-text"><strong>{{.User.Username}}</strong></span>
         <a href="/logout">Logout</a>
       {{else}}
         <a href="/login">Login</a>
