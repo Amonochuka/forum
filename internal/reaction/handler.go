@@ -2,9 +2,10 @@ package reaction
 
 import (
 	"encoding/json"
-	"forum/internal/shared/middleware"
 	"net/http"
 	"strconv"
+
+	"forum/internal/shared/middleware"
 )
 
 type Handler struct {
@@ -113,4 +114,29 @@ func (h *Handler) GetCommentReactionCounts(w http.ResponseWriter, r *http.Reques
 		Likes    int `json:"likes"`
 		Dislikes int `json:"dislikes"`
 	}{likes, dislikes})
+}
+
+func (h *Handler) GetPostReactionCounts(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodGet {
+        http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    postID, err := strconv.Atoi(r.PathValue("id"))
+    if err != nil {
+        http.Error(w, "invalid post id", http.StatusBadRequest)
+        return
+    }
+
+    likes, dislikes, err := h.ReactionService.GetPostReactionCounts(postID)
+    if err != nil {
+        http.Error(w, "could not fetch counts", http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(struct {
+        Likes    int `json:"likes"`
+        Dislikes int `json:"dislikes"`
+    }{likes, dislikes})
 }

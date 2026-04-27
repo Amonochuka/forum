@@ -47,19 +47,17 @@ function fRenderComment(c) {
     </div>
     <p class="f-body">${fEsc(c.body)}</p>
     <div class="f-actions">
-      <span class="f-likes" id="f-likes-${c.id}">👍 ${c.likes}</span>
-      <span class="f-dislikes" id="f-dislikes-${c.id}">👎 ${c.dislikes}</span>
 
       <form action="/react" method="POST" style="display:inline;">
         <input type="hidden" name="comment_id" value="${c.id}">
         <input type="hidden" name="type" value="like">
-        <button type="submit">▲</button>
+        <button type="submit">👍 ${c.likes}</button>
       </form>
 
       <form action="/react" method="POST" style="display:inline;">
         <input type="hidden" name="comment_id" value="${c.id}">
         <input type="hidden" name="type" value="dislike">
-        <button type="submit">▼</button>
+        <button type="submit">👎 ${c.dislikes}</button>
       </form>
 
       <button onclick="fToggleReply(${c.id})">Reply</button>
@@ -95,19 +93,17 @@ function fRenderReply(r) {
     </div>
     <p class="f-body">${fEsc(r.body)}</p>
     <div class="f-actions">
-     <span class="f-likes" id="f-likes-${r.id}">👍 ${r.likes}</span>
-    <span class="f-dislikes" id="f-dislikes-${r.id}">👎 ${r.dislikes}</span>
 
     <form action="/react" method="POST" style="display:inline;">
       <input type="hidden" name="comment_id" value="${r.id}">
       <input type="hidden" name="type" value="like">
-      <button type="submit">▲</button>
+      <button type="submit">👍 ${r.likes}</button>
     </form>
 
     <form action="/react" method="POST" style="display:inline;">
       <input type="hidden" name="comment_id" value="${r.id}">
       <input type="hidden" name="type" value="dislike">
-      <button type="submit">▼</button>
+      <button type="submit">👎 ${r.dislikes}</button>
     </form>
     </div>
   `;

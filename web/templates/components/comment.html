@@ -11,19 +11,16 @@
  
   <div class="f-actions">
 
-    <span class="f-likes" id="f-likes-{{ .ID }}">👍 {{ .Likes }}</span>
-    <span class="f-dislikes" id="f-dislikes-{{ .ID }}">👎 {{ .Dislikes }}</span>
-
     <form action="/react" method="POST" style="display:inline;">
       <input type="hidden" name="comment_id" value="{{ .ID }}">
       <input type="hidden" name="type" value="like">
-      <button type="submit">▲</button>
+      <button type="submit">👍 {{ .Likes }}</button>
     </form>
 
     <form action="/react" method="POST" style="display:inline;">
       <input type="hidden" name="comment_id" value="{{ .ID }}">
       <input type="hidden" name="type" value="dislike">
-      <button type="submit">▼</button>
+      <button type="submit">👎 {{ .Dislikes }}</button>
     </form>
 
     <button onclick="fToggleReply({{ .ID }})">Reply</button>
