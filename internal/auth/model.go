@@ -6,6 +6,6 @@ type User struct {
 	ID        int       `json:"id"`
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
-	Password  string    `json:"-"` // hashed
+	Password  string    `json:"password"` // hashed
 	CreatedAt time.Time `json:"created_at"`
 }
