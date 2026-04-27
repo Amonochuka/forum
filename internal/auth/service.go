@@ -43,6 +43,7 @@ func (s *Service) Register(user User) error {
 
 	_, err := s.Repo.GetUserByEmail(user.Email)
 	if err == nil {
+		fmt.Println("Email exist")
 		// no error means user was found — email already taken
 		return ErrEmailTaken
 	}
