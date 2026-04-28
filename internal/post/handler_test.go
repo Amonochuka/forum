@@ -25,7 +25,7 @@ func TestPostHandler_CreatePost(t *testing.T) {
 	catRepo := NewCategoryRepository(db)
 	userRepo := NewUserRepository(db)
 	reactionRepo := &reaction.ReactionRepository{DB: db}
-	service := NewPostService(postRepo, catRepo, userRepo, reactionRepo)
+	service := NewPostService(postRepo, catRepo, userRepo, reactionRepo, commentRepo)
 	handler := NewPostHandler(service, commentService, tmpl)
 
 	db.Exec(`INSERT INTO categories (id, name) VALUES (1, 'tech')`)
@@ -72,7 +72,7 @@ func TestPostHandler_GetPosts(t *testing.T) {
 	catRepo := NewCategoryRepository(db)
 	userRepo := NewUserRepository(db)
 	reactionRepo := &reaction.ReactionRepository{DB: db}
-	service := NewPostService(postRepo, catRepo, userRepo, reactionRepo)
+	service := NewPostService(postRepo, catRepo, userRepo, reactionRepo, commentRepo)
 	handler := NewPostHandler(service, commentService, tmpl)
 
 	db.Exec(`INSERT INTO categories (id, name) VALUES (1, 'tech')`)

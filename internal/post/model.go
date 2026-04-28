@@ -20,6 +20,7 @@ type PostResponse struct {
 	Category        []Category
 	Likes, Dislikes int
 	CreatedAt       time.Time
+	CommentCount int
 }
 
 type Category struct {

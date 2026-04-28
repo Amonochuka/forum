@@ -96,7 +96,7 @@ async function loadPosts(filter = {}) {
                 <button type="submit">👎 ${post.Dislikes || 0} </button>
             </form>
             
-            <span class="post-comments-link" title="Comments">💬</span>
+            <span class="post-comments-link" title="Comments">💬 ${post.CommentCount || 0}</span>
           </div>
         </div>
       `;

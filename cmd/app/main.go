@@ -80,7 +80,7 @@ func main() {
 	userRepo := post.NewUserRepository(db)
 	reactionRepo := reaction.NewRepository(db)
 
-	postservice := post.NewPostService(postRepo, catRepo, userRepo, reactionRepo)
+	postservice := post.NewPostService(postRepo, catRepo, userRepo, reactionRepo, commentRepo)
 	posthandler := post.NewPostHandler(postservice, commentService, tmpl)
 	post.RegisterPostRoutes(posthandler, requireAuth, optionalAuth)
 

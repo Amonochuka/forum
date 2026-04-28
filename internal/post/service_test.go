@@ -3,6 +3,7 @@ package post
 import (
 	"testing"
 
+	"forum/internal/comment"
 	"forum/internal/reaction"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -17,9 +18,10 @@ func TestPostService_CreateAndGet(t *testing.T) {
 	catRepo := NewCategoryRepository(db)
 	userRepo := NewUserRepository(db)
 	reactionRepo := &reaction.ReactionRepository{DB: db}
+	commentRepo := comment.NewRepository(db)
 
 	// Setup service
-	service := NewPostService(postRepo, catRepo, userRepo, reactionRepo)
+	service := NewPostService(postRepo, catRepo, userRepo, reactionRepo, commentRepo)
 
 	// Create a category
 	_, err := db.Exec(`INSERT INTO categories (id, name) VALUES (1, 'tech')`)
@@ -67,7 +69,8 @@ func TestPostService_GetPostsByCategory(t *testing.T) {
 	catRepo := NewCategoryRepository(db)
 	userRepo := NewUserRepository(db)
 	reactionRepo := &reaction.ReactionRepository{DB: db}
-	service := NewPostService(postRepo, catRepo, userRepo, reactionRepo)
+	commentRepo := comment.NewRepository(db)
+	service := NewPostService(postRepo, catRepo, userRepo, reactionRepo, commentRepo)
 
 	db.Exec(`INSERT INTO categories (id, name) VALUES (1, 'science')`)
 	db.Exec(`INSERT INTO categories (id, name) VALUES (2, 'art')`)
