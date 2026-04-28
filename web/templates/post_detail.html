@@ -84,7 +84,7 @@
 <!-- Reaction Handling (NO REDIRECT) -->
 <!-- ============================= -->
 <script>
-document.addEventListener("submit", async function (e) {
+document.addEventListener("submit", async (e) => {
   const form = e.target;
 
   if (!form.classList.contains("reaction-form")) return;
@@ -99,26 +99,29 @@ document.addEventListener("submit", async function (e) {
       credentials: "same-origin"
     });
 
+    // 🔴 IMPORTANT: read body (forces fetch to resolve fully)
+    const data = await res.json().catch(() => null);
+
     if (res.status === 401) {
       alert("You must be logged in to react.");
       return;
     }
 
     if (!res.ok) {
+      console.error("Reaction failed:", data);
       alert("Failed to react.");
       return;
     }
 
-    // Simple & reliable for post detail
+    // ✅ SUCCESS
     location.reload();
 
   } catch (err) {
     console.error(err);
-    alert("Network error. Please try again.");
+    alert("Network error.");
   }
 });
 </script>
-
 </body>
 </html>
 {{ end }}

@@ -2,8 +2,9 @@ package post
 
 import (
 	"errors"
-	"strconv"
+	"forum/internal/comment"
 	"forum/internal/reaction"
+	"strconv"
 )
 
 type PostService struct {
@@ -11,16 +12,18 @@ type PostService struct {
 	userRepo     *UserRepository
 	categoryRepo *CategoryRepository
 	reactionRepo *reaction.ReactionRepository
+	commentRepo comment.Repository
 }
 
 var ErrEmptyContent = errors.New("content cannot be empty")
 
-func NewPostService(postRepo *PostRepository, catRepo *CategoryRepository, userRepo *UserRepository, reactionRepo *reaction.ReactionRepository) *PostService {
+func NewPostService(postRepo *PostRepository, catRepo *CategoryRepository, userRepo *UserRepository, reactionRepo *reaction.ReactionRepository, commentRepo comment.Repository) *PostService {
 	return &PostService{
 		postRepo:     postRepo,
 		categoryRepo: catRepo,
 		userRepo:     userRepo,
 		reactionRepo: reactionRepo,
+		commentRepo: commentRepo,
 	}
 }
 
@@ -41,6 +44,11 @@ func (s *PostService) buildPostResponse(post Post) (PostResponse, error) {
 		likes, dislikes = 0, 0
 	}
 
+	commentCount, err := s.commentRepo.GetCountByPostID(post.ID)
+	if err != nil {
+		commentCount = 0
+	}
+
 	return PostResponse{
 		ID:        post.ID,
 		Title:     post.Title,
@@ -50,6 +58,7 @@ func (s *PostService) buildPostResponse(post Post) (PostResponse, error) {
 		Likes:     likes,
 		Dislikes:  dislikes,
 		CreatedAt: post.CreatedAt,
+		CommentCount: commentCount,
 	}, nil
 }
 

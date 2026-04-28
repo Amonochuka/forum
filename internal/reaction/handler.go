@@ -87,12 +87,11 @@ func (h *Handler) React(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Redirect back
-	ref := r.Referer()
-	if ref == "" {
-		ref = "/"
-	}
-	http.Redirect(w, r, ref, http.StatusSeeOther)
+	// ✅ SUCCESS (NO REDIRECT)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"status": "ok",
+	})
 }
 
 func (h *Handler) GetCommentReactionCounts(w http.ResponseWriter, r *http.Request) {
