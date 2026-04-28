@@ -28,7 +28,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 }
 
 func (r *PostRepository) GetPost() ([]Post, error) {
-	row, err := r.db.Query("SELECT id, user_id, title, content, created_at FROM posts")
+	row, err := r.db.Query("SELECT id, user_id, title, content, created_at FROM posts ORDER BY created_at DESC")
 	if err != nil {
 		return nil, err
 	}
@@ -55,6 +55,7 @@ func (r *PostRepository) GetPostByCategory(categoryName string) ([]Post, error) 
 		JOIN post_categories pc ON p.id = pc.post_id
 		JOIN categories c ON pc.category_id = c.id
 		WHERE c.name = ?
+		ORDER BY p.created_at DESC
 	`, categoryName)
 	if err != nil {
 		return nil, err
@@ -91,6 +92,7 @@ func (r *PostRepository) GetPostByUser(userID int) ([]Post, error) {
 	SELECT id, user_id, title, content, created_at
 	FROM posts
 	WHERE user_id = ? 
+	ORDER BY created_at DESC
 	`, userID)
 	if err != nil {
 		return nil, err
@@ -129,6 +131,7 @@ func (r *PostRepository) GetPostsLikedByUser(userID int) ([]Post, error) {
 		FROM posts p
 		JOIN reactions re ON p.id = re.post_id
 		WHERE re.user_id = ? AND re.reaction_type = 1
+		ORDER BY p.created_at DESC
 	`, userID)
 	if err != nil {
 		return nil, err
