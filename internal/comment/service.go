@@ -1,6 +1,9 @@
 package comment
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 var (
 	ErrEmptyContent          = errors.New("content cannot be empty")
@@ -25,6 +28,8 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) CreateComment(userID, postID int, content string, parentID *int) (*Comment, error) {
+	content = strings.TrimSpace(content)
+
 	if content == "" {
 		return nil, ErrEmptyContent
 	}

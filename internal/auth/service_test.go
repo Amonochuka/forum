@@ -34,3 +34,22 @@ func TestRegister_EmailTaken(t *testing.T) {
 		t.Errorf("expected ErrEmailTaken, got %v", err)
 	}
 }
+
+func TestRegister_UsernameTaken(t *testing.T) {
+	mock := &MockRepo{
+		GetUserByEmailFunc: func(email string) (User, error) {
+			return User{}, ErrUserNotFound
+		},
+		CreateUserFunc: func(user User) error {
+			return ErrUsernameExists
+		},
+	}
+
+	service := NewService(mock)
+
+	err := service.Register(User{Username: "taken", Email: "new@test.com", Password: "password123"})
+
+	if !errors.Is(err, ErrUsernameTaken) {
+		t.Errorf("expected ErrUsernameTaken, got %v", err)
+	}
+}

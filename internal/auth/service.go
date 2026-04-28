@@ -14,6 +14,7 @@ type Service struct {
 
 var (
 	ErrEmailTaken      = errors.New("email already taken")
+	ErrUsernameTaken   = errors.New("username already taken")
 	ErrUsernameMissing = errors.New("username is required")
 	ErrEmailMissing    = errors.New("email is required")
 	ErrPasswordShort   = errors.New("password must be at least 8 characters")
@@ -57,7 +58,17 @@ func (s *Service) Register(user User) error {
 		return err
 	}
 	user.Password = string(hashedPassword)
-	return s.Repo.CreateUser(user)
+	if err := s.Repo.CreateUser(user); err != nil {
+		switch {
+		case errors.Is(err, ErrEmailExists):
+			return ErrEmailTaken
+		case errors.Is(err, ErrUsernameExists):
+			return ErrUsernameTaken
+		default:
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *Service) Login(email, password string) (User, error) {

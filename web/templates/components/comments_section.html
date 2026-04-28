@@ -7,7 +7,7 @@
   <div class="f-compose">
     <!-- <div class="f-avatar"></div> -->
     <div class="f-compose-body">
-      <textarea id="f-new-comment" placeholder="Contribute to the discourse..." rows="3"></textarea>
+      <textarea id="f-new-comment" placeholder="Contribute to the discourse..." rows="3" oninput="this.setCustomValidity('')"></textarea>
       <button onclick="fSubmitComment({{ .PostID }}, 'f-new-comment', 'f-comment-list')">
         Post Comment
       </button>

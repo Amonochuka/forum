@@ -34,7 +34,7 @@
   </div>
  
   <div id="f-reply-form-{{ .ID }}" style="display:none;" class="f-reply-form">
-    <textarea id="f-reply-text-{{ .ID }}" placeholder="Write a reply..." rows="2"></textarea>
+    <textarea id="f-reply-text-{{ .ID }}" placeholder="Write a reply..." rows="2" oninput="this.setCustomValidity('')"></textarea>
     <button onclick="fSubmitReply({{ .ID }}, 'f-reply-text-{{ .ID }}', 'f-replies-{{ .ID }}')">Reply</button>
     <button onclick="fToggleReply({{ .ID }})">Cancel</button>
   </div>

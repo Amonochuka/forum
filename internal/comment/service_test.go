@@ -7,24 +7,56 @@ import (
 
 // MockRepo implements the comment.Repository interface
 type MockRepo struct {
-	CreateFunc                        func(comment *Comment) error
+	CreateFunc                         func(comment *Comment) error
 	GetTopLevelByPostWithReactionsFunc func(postID, limit, offset int) ([]Comment, error)
 	GetRepliesByParentIDWithReactionsFunc func(parentID int) ([]Comment, error)
-	GetByIDFunc                       func(id int) (*Comment, error)
-	GetCountByPostIDFunc              func(postID int) (int, error)
+	GetByIDFunc                        func(id int) (*Comment, error)
+	GetCountByPostIDFunc               func(postID int) (int, error)
 }
 
-func (m *MockRepo) Create(c *Comment) error { return m.CreateFunc(c) }
+func (m *MockRepo) Create(c *Comment) error {
+	if m.CreateFunc == nil {
+		return nil
+	}
+	return m.CreateFunc(c)
+}
 func (m *MockRepo) GetTopLevelByPostWithReactions(p, l, o int) ([]Comment, error) {
+	if m.GetTopLevelByPostWithReactionsFunc == nil {
+		return nil, nil
+	}
 	return m.GetTopLevelByPostWithReactionsFunc(p, l, o)
 }
 func (m *MockRepo) GetRepliesByParentIDWithReactions(id int) ([]Comment, error) {
+	if m.GetRepliesByParentIDWithReactionsFunc == nil {
+		return nil, nil
+	}
 	return m.GetRepliesByParentIDWithReactionsFunc(id)
 }
-func (m *MockRepo) GetByID(id int) (*Comment, error) { return m.GetByIDFunc(id) }
-func (m *MockRepo) GetCountByPostID(id int) (int, error) { return m.GetCountByPostIDFunc(id) }
+func (m *MockRepo) GetByID(id int) (*Comment, error) {
+	if m.GetByIDFunc == nil {
+		return nil, nil
+	}
+	return m.GetByIDFunc(id)
+}
+func (m *MockRepo) GetCountByPostID(id int) (int, error) {
+	if m.GetCountByPostIDFunc == nil {
+		return 0, nil
+	}
+	return m.GetCountByPostIDFunc(id)
+}
 
 // --- Tests ---
+
+func TestCreateComment_RejectsWhitespaceOnlyContent(t *testing.T) {
+	mock := &MockRepo{}
+	service := NewService(mock)
+
+	_, err := service.CreateComment(1, 101, "   \n\t  ", nil)
+
+	if !errors.Is(err, ErrEmptyContent) {
+		t.Fatalf("expected ErrEmptyContent, got %v", err)
+	}
+}
 
 func TestCreateComment_PreventNestedReplies(t *testing.T) {
 	// Setup: Parent is a reply (it has a ParentID), so we shouldn't be allowed to reply to it

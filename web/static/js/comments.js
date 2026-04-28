@@ -31,6 +31,12 @@ function fShowAuthPrompt(scope, message) {
   scope.appendChild(prompt);
 }
 
+function fShowEmptyMessage(textarea, message) {
+  if (!textarea) return;
+  textarea.setCustomValidity(message);
+  textarea.reportValidity();
+}
+
 // Build a comment element
 function fRenderComment(c) {
   const div = document.createElement('div');
@@ -68,7 +74,7 @@ function fRenderComment(c) {
       ` : ''}
     </div>
     <div id="f-reply-form-${c.id}" style="display:none;" class="f-reply-form">
-      <textarea id="f-reply-text-${c.id}" placeholder="Write a reply..." rows="2"></textarea>
+      <textarea id="f-reply-text-${c.id}" placeholder="Write a reply..." rows="2" oninput="this.setCustomValidity('')"></textarea>
       <div>
         <button onclick="fSubmitReply(${c.id}, 'f-reply-text-${c.id}', 'f-replies-${c.id}')">Reply</button>
         <button onclick="fToggleReply(${c.id})">Cancel</button>
@@ -118,7 +124,11 @@ function fSubmitComment(postID, textareaID, listID) {
   if (!textarea || !list) return;
  
   const content = textarea.value.trim();
-  if (!content) return;
+  if (!content) {
+    fShowEmptyMessage(textarea, 'Please enter a comment before posting.');
+    return;
+  }
+  textarea.setCustomValidity('');
 
   const btn = textarea.closest('.f-compose-body').querySelector('button');
   const composeBody = textarea.closest('.f-compose-body');
@@ -253,7 +263,11 @@ function fSubmitReply(parentID, textareaID, repliesContainerID) {
   if (!textarea || !container) return;
  
   const content = textarea.value.trim();
-  if (!content) return;
+  if (!content) {
+    fShowEmptyMessage(textarea, 'Please enter a reply before posting.');
+    return;
+  }
+  textarea.setCustomValidity('');
  
   const postID = parseInt(
     document.getElementById('f-comments')?.dataset.postId || '0', 10
