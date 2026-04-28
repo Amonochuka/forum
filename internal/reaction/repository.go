@@ -5,7 +5,17 @@ import (
 	"errors"
 	"fmt"
 )
+type Repository interface {
+	GetUserReaction(int, *int, *int) (*Reaction, error)
+	AddReaction(*Reaction) error
+	UpdateReaction(*Reaction) error
+	DeleteReaction(int, *int, *int) error
 
+	GetPostReactions(int) ([]*Reaction, error)
+	GetCommentReactions(int) ([]*Reaction, error)
+	GetPostReactionCounts(int) (int, int, error)
+	GetCommentReactionCounts(int) (int, int, error)
+}
 type ReactionRepository struct {
 	DB *sql.DB
 }

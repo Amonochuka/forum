@@ -3,7 +3,7 @@ package reaction
 import "errors"
 
 type ReactionService struct {
-	Repo *ReactionRepository
+	Repo Repository
 }
 
 func (s *ReactionService) React(r *Reaction) error {
