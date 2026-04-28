@@ -43,9 +43,9 @@ function fRenderComment(c) {
   div.className = 'f-comment';
   div.id = 'f-comment-' + c.id;
   div.dataset.id = c.id;
- 
+
   const replyCountLabel = c.replyCount === 1 ? '1 reply' : c.replyCount + ' replies';
- 
+
   div.innerHTML = `
     <div class="f-comment-header">
       <span class="f-author">${fEsc(c.authorName)}</span>
@@ -53,19 +53,16 @@ function fRenderComment(c) {
     </div>
     <p class="f-body">${fEsc(c.body)}</p>
     <div class="f-actions">
-
-      <form action="/react" method="POST" style="display:inline;">
+      <form action="/react" method="POST" class="reaction-form" style="display:inline;">
         <input type="hidden" name="comment_id" value="${c.id}">
         <input type="hidden" name="type" value="like">
-        <button type="submit">👍 ${c.likes}</button>
+        <button type="submit">👍 <span id="f-likes-${c.id}">${c.likes}</span></button>
       </form>
-
-      <form action="/react" method="POST" style="display:inline;">
+      <form action="/react" method="POST" class="reaction-form" style="display:inline;">
         <input type="hidden" name="comment_id" value="${c.id}">
         <input type="hidden" name="type" value="dislike">
-        <button type="submit">👎 ${c.dislikes}</button>
+        <button type="submit">👎 <span id="f-dislikes-${c.id}">${c.dislikes}</span></button>
       </form>
-
       <button onclick="fToggleReply(${c.id})">Reply</button>
       ${c.replyCount > 0 ? `
         <button id="f-view-replies-${c.id}" onclick="fLoadReplies(${c.id}, this)">
@@ -82,7 +79,7 @@ function fRenderComment(c) {
     </div>
     <div id="f-replies-${c.id}" class="f-replies"></div>
   `;
- 
+
   return div;
 }
 
@@ -90,7 +87,7 @@ function fRenderReply(r) {
   const div = document.createElement('div');
   div.className = 'f-comment';
   div.id = 'f-comment-' + r.id;
- 
+
   div.innerHTML = `
     <div class="f-comment-header">
       <span class="f-author">${fEsc(r.authorName)}</span>
@@ -99,21 +96,19 @@ function fRenderReply(r) {
     </div>
     <p class="f-body">${fEsc(r.body)}</p>
     <div class="f-actions">
-
-    <form action="/react" method="POST" style="display:inline;">
-      <input type="hidden" name="comment_id" value="${r.id}">
-      <input type="hidden" name="type" value="like">
-      <button type="submit">👍 ${r.likes}</button>
-    </form>
-
-    <form action="/react" method="POST" style="display:inline;">
-      <input type="hidden" name="comment_id" value="${r.id}">
-      <input type="hidden" name="type" value="dislike">
-      <button type="submit">👎 ${r.dislikes}</button>
-    </form>
+      <form action="/react" method="POST" class="reaction-form" style="display:inline;">
+        <input type="hidden" name="comment_id" value="${r.id}">
+        <input type="hidden" name="type" value="like">
+        <button type="submit">👍 <span id="f-likes-${r.id}">${r.likes}</span></button>
+      </form>
+      <form action="/react" method="POST" class="reaction-form" style="display:inline;">
+        <input type="hidden" name="comment_id" value="${r.id}">
+        <input type="hidden" name="type" value="dislike">
+        <button type="submit">👎 <span id="f-dislikes-${r.id}">${r.dislikes}</span></button>
+      </form>
     </div>
   `;
- 
+
   return div;
 }
 
@@ -122,7 +117,7 @@ function fSubmitComment(postID, textareaID, listID) {
   const textarea = document.getElementById(textareaID);
   const list = document.getElementById(listID);
   if (!textarea || !list) return;
- 
+
   const content = textarea.value.trim();
   if (!content) {
     fShowEmptyMessage(textarea, 'Please enter a comment before posting.');
@@ -135,10 +130,10 @@ function fSubmitComment(postID, textareaID, listID) {
   fClearAuthPrompt(composeBody);
   btn.disabled = true;
   btn.textContent = 'Posting...';
- 
+
   const form = new FormData();
   form.append('content', content);
- 
+
   fetch('/posts/' + postID + '/comments', { method: 'POST', body: form })
     .then(function(r) {
       if (r.status === 401) {
@@ -150,8 +145,7 @@ function fSubmitComment(postID, textareaID, listID) {
     .then(function(data) {
       list.prepend(fRenderComment(data.comment));
       textarea.value = '';
- 
-      /* bump the count in the heading */
+
       const heading = document.querySelector('#f-comments h3');
       if (heading) {
         heading.textContent = heading.textContent.replace(/\d+/, function(n) {
@@ -176,21 +170,21 @@ function fSubmitComment(postID, textareaID, listID) {
 function fLoadMore(postID, btn) {
   const list = document.getElementById('f-comment-list');
   const page = parseInt(btn.dataset.page || '2', 10);
- 
+
   btn.disabled = true;
   btn.textContent = 'Loading...';
- 
+
   fetch('/posts/' + postID + '/comments?page=' + page)
-    .then(function(r) { 
+    .then(function(r) {
       if (!r.ok) throw new Error('failed');
-      return r.json(); 
+      return r.json();
     })
     .then(function(data) {
       (data.comments || []).forEach(function(c) {
         list.appendChild(fRenderComment(c));
       });
       btn.dataset.page = page + 1;
- 
+
       const loaded = list.querySelectorAll('.f-comment').length;
       if (loaded >= data.total) {
         btn.style.display = 'none';
@@ -220,33 +214,33 @@ function fToggleReply(commentID) {
 function fLoadReplies(commentID, btn) {
   const container = document.getElementById('f-replies-' + commentID);
   if (!container) return;
- 
+
   if (container.dataset.loaded) {
     const isHidden = container.style.display === 'none';
     container.style.display = isHidden ? 'flex' : 'none';
     btn.textContent = isHidden ? '▲ hide replies' : btn.dataset.label;
     return;
   }
- 
+
   btn.textContent = 'Loading...';
   btn.disabled = true;
- 
+
   fetch('/comments/' + commentID + '/replies')
-    .then(function(r) { 
+    .then(function(r) {
       if (!r.ok) throw new Error('failed');
-      return r.json(); 
+      return r.json();
     })
     .then(function(data) {
       const replies = data.replies || [];
       replies.forEach(function(r) {
         container.appendChild(fRenderReply(r));
       });
- 
+
       const label = replies.length === 1 ? '1 reply' : replies.length + ' replies';
       container.dataset.loaded = 'true';
       btn.dataset.label = label;
-      container.style.display  = 'flex';
- 
+      container.style.display = 'flex';
+
       btn.textContent = '▲ hide replies';
       btn.disabled = false;
     })
@@ -256,19 +250,19 @@ function fLoadReplies(commentID, btn) {
     });
 }
 
-// submit a reply to a comment
+// Submit a reply to a comment
 function fSubmitReply(parentID, textareaID, repliesContainerID) {
-  const textarea  = document.getElementById(textareaID);
+  const textarea = document.getElementById(textareaID);
   const container = document.getElementById(repliesContainerID);
   if (!textarea || !container) return;
- 
+
   const content = textarea.value.trim();
   if (!content) {
     fShowEmptyMessage(textarea, 'Please enter a reply before posting.');
     return;
   }
   textarea.setCustomValidity('');
- 
+
   const postID = parseInt(
     document.getElementById('f-comments')?.dataset.postId || '0', 10
   );
@@ -278,11 +272,11 @@ function fSubmitReply(parentID, textareaID, repliesContainerID) {
   fClearAuthPrompt(replyForm);
   btn.disabled = true;
   btn.textContent = 'Posting...';
- 
+
   const form = new FormData();
   form.append('content', content);
   form.append('post_id', postID);
- 
+
   fetch('/comments/' + parentID + '/replies', { method: 'POST', body: form })
     .then(function(r) {
       if (r.status === 401) {
@@ -295,27 +289,26 @@ function fSubmitReply(parentID, textareaID, repliesContainerID) {
       container.style.display = 'flex';
       container.dataset.loaded = 'true';
       container.appendChild(fRenderReply(data.comment));
- 
-      // update or create the view-replies button
+
       const viewBtn = document.getElementById('f-view-replies-' + parentID);
       if (viewBtn) {
-        const prev  = parseInt(viewBtn.dataset.label || '0', 10);
+        const prev = parseInt(viewBtn.dataset.label || '0', 10);
         const count = prev + 1;
         const label = count === 1 ? '1 reply' : count + ' replies';
         viewBtn.dataset.label = label;
-        viewBtn.textContent   = '▲ hide replies';
+        viewBtn.textContent = '▲ hide replies';
       } else {
         const actions = document.querySelector('#f-comment-' + parentID + ' .f-actions');
         if (actions) {
           const newBtn = document.createElement('button');
           newBtn.id = 'f-view-replies-' + parentID;
           newBtn.dataset.label = '1 reply';
-          newBtn.textContent   = '▲ hide replies';
+          newBtn.textContent = '▲ hide replies';
           newBtn.onclick = function() { fLoadReplies(parentID, newBtn); };
           actions.appendChild(newBtn);
         }
       }
- 
+
       textarea.value = '';
       fToggleReply(parentID);
     })

@@ -2,6 +2,7 @@ package reaction
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -34,10 +35,16 @@ func (h *Handler) React(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Parse form
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, "invalid form", http.StatusBadRequest)
-		return
+	if err := r.ParseMultipartForm(32 << 20); err != nil {
+		// fallback to regular form parse
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "invalid form", http.StatusBadRequest)
+			return
+		}
 	}
+
+	log.Printf("type value: %q", r.FormValue("type"))
+	log.Printf("post_id value: %q", r.FormValue("post_id"))
 
 	// Convert string type to int
 	var reactionType int
@@ -87,11 +94,12 @@ func (h *Handler) React(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ✅ SUCCESS (NO REDIRECT)
+	//successful reaction
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
 		"status": "ok",
 	})
+
 }
 
 func (h *Handler) GetCommentReactionCounts(w http.ResponseWriter, r *http.Request) {

@@ -85,16 +85,18 @@ async function loadPosts(filter = {}) {
             <form class="reaction-form" action="/react" method="POST">
               <input type="hidden" name="post_id" value="${post.ID}">
               <input type="hidden" name="type" value="like">
-              <button type="submit">👍 ${post.Likes || 0}</button>
+              <button type="submit">👍 <span id="like-count-${post.ID}">${post.Likes || 0}</span></button>
             </form>
 
             <form class="reaction-form" action="/react" method="POST">
               <input type="hidden" name="post_id" value="${post.ID}">
               <input type="hidden" name="type" value="dislike">
-              <button type="submit">👎 ${post.Dislikes || 0}</button>
+              <button type="submit">👎 <span id="dislike-count-${post.ID}">${post.Dislikes || 0}</span></button>
             </form>
 
-            <span class="post-comments-link">💬</span>
+            <span class="post-comments-link" title="View comments">
+              💬 ${post.CommentCount || 0}
+            </span>
           </div>
         </div>
       `;
@@ -131,9 +133,9 @@ async function loadPosts(filter = {}) {
   }
 }
 
-// ================================
-// Reaction Handler (NO REDIRECT)
-// ================================
+// =================
+// Reaction Handler 
+// =================
 document.addEventListener("submit", async e => {
   const form = e.target;
 
@@ -142,10 +144,17 @@ document.addEventListener("submit", async e => {
   e.preventDefault();
   e.stopPropagation();
 
+  const formData = new FormData(form);
+  const postID = formData.get("post_id");
+  const type = formData.get("type");
+
+  console.log("post_id:", postID);
+  console.log("type:", type);
+
   try {
-    const res = await fetch(form.action, {
+    const res = await fetch("/react", {
       method: "POST",
-      body: new FormData(form),
+      body: formData,
       credentials: "same-origin"
     });
 
@@ -155,20 +164,33 @@ document.addEventListener("submit", async e => {
     }
 
     if (!res.ok) {
-      alert("Failed to react.");
+      const text = await res.text();
+      console.error("React error:", text);
+      alert("Failed to react: " + text);
       return;
     }
 
-    loadPosts(); // refresh counts
+    // update counts in place
+    if (postID) {
+      const countRes = await fetch(`/posts/${postID}/reactions`);
+      if (countRes.ok) {
+        const counts = await countRes.json();
+        const likeEl = document.getElementById(`like-count-${postID}`);
+        const dislikeEl = document.getElementById(`dislike-count-${postID}`);
+        if (likeEl) likeEl.textContent = counts.likes;
+        if (dislikeEl) dislikeEl.textContent = counts.dislikes;
+      }
+    }
+
   } catch (err) {
     console.error(err);
     alert("Network error.");
   }
 });
 
-// ================================
+// ============
 // Create Post
-// ================================
+// ============
 const postForm = document.getElementById("postForm");
 
 if (postForm) {
@@ -202,9 +224,9 @@ if (postForm) {
   });
 }
 
-// ================================
+// ============
 // Initial Load
-// ================================
+// =============
 window.onload = () => {
   loadCategories();
   loadPosts();

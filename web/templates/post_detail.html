@@ -45,23 +45,17 @@
         </span>
 
         <div class="post-actions">
-
           <form action="/react" method="POST" class="reaction-form" style="display:inline;">
             <input type="hidden" name="post_id" value="{{ .PostID }}">
             <input type="hidden" name="type" value="like">
-            <button type="submit">
-              👍 <span id="post-like-count">{{ .Post.Likes }}</span>
-            </button>
+            <button type="submit">👍 <span id="post-like-count">{{ .Post.Likes }}</span></button>
           </form>
 
           <form action="/react" method="POST" class="reaction-form" style="display:inline;">
             <input type="hidden" name="post_id" value="{{ .PostID }}">
             <input type="hidden" name="type" value="dislike">
-            <button type="submit">
-              👎 <span id="post-dislike-count">{{ .Post.Dislikes }}</span>
-            </button>
+            <button type="submit">👎 <span id="post-dislike-count">{{ .Post.Dislikes }}</span></button>
           </form>
-
         </div>
       </div>
 
@@ -73,34 +67,25 @@
 </div>
 
 <footer class="footer">
-  <div class="container">
-    Forum &copy; 2026
-  </div>
+  <div class="container">Forum &copy; 2026</div>
 </footer>
 
 <script src="/static/js/comments.js"></script>
 
-<!-- ============================= -->
-<!-- Reaction Handling (NO REDIRECT) -->
-<!-- ============================= -->
 <script>
 document.addEventListener("submit", async (e) => {
   const form = e.target;
-
   if (!form.classList.contains("reaction-form")) return;
 
   e.preventDefault();
   e.stopPropagation();
 
   try {
-    const res = await fetch(form.action, {
+    const res = await fetch("/react", {
       method: "POST",
       body: new FormData(form),
       credentials: "same-origin"
     });
-
-    // 🔴 IMPORTANT: read body (forces fetch to resolve fully)
-    const data = await res.json().catch(() => null);
 
     if (res.status === 401) {
       alert("You must be logged in to react.");
@@ -108,13 +93,36 @@ document.addEventListener("submit", async (e) => {
     }
 
     if (!res.ok) {
-      console.error("Reaction failed:", data);
-      alert("Failed to react.");
+      const text = await res.text();
+      alert("Failed to react: " + text);
       return;
     }
 
-    // ✅ SUCCESS
-    location.reload();
+    // update post counts
+    const postID = document.getElementById("post-details")?.dataset.postId;
+    if (postID) {
+      const countRes = await fetch(`/posts/${postID}/reactions`);
+      if (countRes.ok) {
+        const counts = await countRes.json();
+        const likeEl = document.getElementById("post-like-count");
+        const dislikeEl = document.getElementById("post-dislike-count");
+        if (likeEl) likeEl.textContent = counts.likes;
+        if (dislikeEl) dislikeEl.textContent = counts.dislikes;
+      }
+    }
+
+    // update comment counts
+    const commentID = new FormData(form).get("comment_id");
+    if (commentID) {
+      const countRes = await fetch(`/comments/${commentID}/reactions`);
+      if (countRes.ok) {
+        const counts = await countRes.json();
+        const likesEl = document.getElementById(`f-likes-${commentID}`);
+        const dislikesEl = document.getElementById(`f-dislikes-${commentID}`);
+        if (likesEl) likesEl.textContent = counts.likes;
+        if (dislikesEl) dislikesEl.textContent = counts.dislikes;
+      }
+    }
 
   } catch (err) {
     console.error(err);
