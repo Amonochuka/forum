@@ -18,7 +18,7 @@ RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 \
     go build -o forum ./cmd/app
 
 # RUNTIME STAGE
-FROM alpine:3.19
+FROM alpine:latest
 
 # Install SQLite runtime libraries
 RUN apk add --no-cache sqlite-libs
